@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berlin Cheung - Property Management & Facilities Professional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1e3a5f;
+            --secondary-color: #2c5aa0;
+            --accent-color: #0091d9;
+            --light-bg: #f8fbff;
+            --text-dark: #1a1a1a;
+            --text-light: #555555;
+            --border-color: #e0e0e0;
+            --success-color: #27ae60;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: #ffffff;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Mobile menu toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 70px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+        }
+
+        .hero-photos {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .photo-card {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+        }
+
+        .photo-card img {
+            width: 200px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .cta-button:hover {
+            background-color: #0078b8;
+            transform: scale(1.05);
+        }
+
+        /* About Section */
+        .about {
+            padding: 4rem 2rem;
+            background-color: var(--light-bg);
+            margin-top: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .about-item h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .about-item p {
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        /* Experience Section */
+        .experience {
+            padding: 4rem 2rem;
+            background-color: white;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--accent-color), var(--secondary-color));
+        }
+
+        .timeline-item {
+            margin-bottom: 2rem;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--accent-color);
+        }
+
+        .timeline-item h4 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-item .company {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-item .date {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .timeline-item ul {
+            margin-left: 1rem;
+            color: var(--text-light);
+            list-style-position: inside;
+        }
+
+        .timeline-item li {
+            margin-bottom: 0.4rem;
+        }
+
+        /* Education Section */
+        .education {
+            padding: 4rem 2rem;
+            background-color: var(--light-bg);
+        }
+
+        .education-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .education-item {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid var(--accent-color);
+            transition: transform 0.3s ease;
+        }
+
+        .education-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .education-item h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .education-item .institution {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .education-item .period {
+            color: #999;
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Skills Section */
+        .skills {
+            padding: 4rem 2rem;
+            background: white;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .skill-category {
+            background: var(--light-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .skill-category h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.15rem;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+        }
+
+        .skill-tag {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Certifications Section */
+        .certifications {
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #f8fbff 0%, #e8f1ff 100%);
+        }
+
+        .cert-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .cert-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border-left: 4px solid var(--success-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .cert-icon {
+            font-size: 1.8rem;
+            color: var(--success-color);
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 4rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+        }
+
+        .contact h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .contact-item strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .contact-item a {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-item a:hover {
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: #0f1f38;
+            color: #999;
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .education-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .photo-card img {
+                width: 150px;
+                height: 190px;
+            }
+
+            nav {
+                padding: 1rem;
+            }
+
+            .hero {
+                margin-top: 60px;
+                padding: 2rem 1rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .cert-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-photos {
+                flex-direction: column;
+            }
+
+            .photo-card img {
+                width: 120px;
+                height: 160px;
+            }
+
+            .hero-text h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero-text p {
+                font-size: 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">Berlin Cheung</div>
+        <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#education">Education</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button class="mobile-menu-toggle">☰</button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Berlin Cheung</h1>
+                <p>Property Management & Facilities Professional</p>
+                <p style="font-size: 1rem; margin-top: 1rem;">Dedicated to excellence in property asset management, tenant services, and facilities oversight with 15+ years of progressive experience across leading Hong Kong organizations.</p>
+                <a href="#contact" class="cta-button">Get In Touch</a>
+            </div>
+            <div class="hero-photos">
+            
+                <div class="photo-card">
+            <div class="hero-image">
+                <img src="https://i.postimg.cc/y8QBxDK6/p1.jpg" alt="Berlin Cheung">
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-grid">
+                <div class="about-item">
+                    <h3>Professional Background</h3>
+                    <p>Throughout my career spanning more than 7 years in property management, I have gained valuable working experience in addressing owners' and tenants' complaints, handling financial matters, preparing and maintaining property-related documents, managing emergency cases, liaising with contractors, and overseeing contractor performance. My experience combined with my education background demonstrates a commitment to excellence in property and facilities management.</p>
+                </div>
+                <div class="about-item">
+                    <h3>Core Strengths</h3>
+                    <p><strong>Self-initiative & Leadership:</strong> Energetic professional with strong presentation skills, responsible and independent, demonstrating excellent adaptability.<br><br><strong>Expertise:</strong> Property asset management, tenant relations, facilities coordination, documentation, emergency response, contractor liaison, and stakeholder engagement.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="experience">
+        <div class="container">
+            <h2 class="section-title">Professional Experience</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>Property Asset Officer</h4>
+                    <div class="company">Urban Property Management Limited</div>
+                    <div class="date">April 2024 – Present</div>
+                    <ul>
+                        <li>Handle residents' complaints and enquiries</li>
+                        <li>Reflect residents' opinions to different departments</li>
+                        <li>Coordinate with colleagues from different departments</li>
+                        <li>Manage daily documents including notices, follow-ups, record keeping, and deposit refund procedures</li>
+                        <li>Monitor daily estate operations</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>Executive Assistant, Transport Department Vehicle Examination Complex</h4>
+                    <div class="company">Allegro (HK) Limited</div>
+                    <div class="date">May 2023 – October 2023</div>
+                    <ul>
+                        <li>Supervised and coordinated daily premises maintenance and repairs</li>
+                        <li>Reviewed electricity and water supply consumption</li>
+                        <li>Proposed energy and water saving methods</li>
+                        <li>Supervised service agents and coordinated contractor representatives</li>
+                        <li>Coordinated with government representatives and managed space planning</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>Senior Officer, Facilities Management</h4>
+                    <div class="company">New World Facilities Management Company Limited</div>
+                    <div class="date">December 2021 – May 2023</div>
+                    <ul>
+                        <li>Maintained smooth day-to-day operations and achieved KPI targets</li>
+                        <li>Supervised service teams and contractors for facilities management</li>
+                        <li>Set up and reviewed departmental policies and procedures</li>
+                        <li>Prepared annual budgets, reports, and improvement proposals</li>
+                        <li>Handled emergency incidents and customer complaints</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>Tenant Services Officer</h4>
+                    <div class="company">Miramar Hotel and Property Management Company Limited</div>
+                    <div class="date">June 2019 – November 2021</div>
+                    <ul>
+                        <li>Handled tenant enquiries, requests, and emergency cases</li>
+                        <li>Coordinated with contractors and monitored work progress</li>
+                        <li>Oversaw property maintenance, cleaning, and security services</li>
+                        <li>Managed premise handover and takeover procedures</li>
+                        <li>Prepared monthly reports and maintained excellent tenant relations</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>Assistant Property Officer</h4>
+                    <div class="company">Guardian Property Management Limited</div>
+                    <div class="date">July 2016 – March 2019</div>
+                    <ul>
+                        <li>Assisted Property Manager in day-to-day operations and liaison</li>
+                        <li>Built and maintained relationships with tenants and owners</li>
+                        <li>Attended management and owners' committee meetings</li>
+                        <li>Monitored on-site staff and contractor performance</li>
+                        <li>Supervised property maintenance, cleaning, and security services</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>Security Officer</h4>
+                    <div class="company">Avseco</div>
+                    <div class="date">May 2010 – June 2016</div>
+                    <ul>
+                        <li>Conducted armored vehicle and valuable cargo escort and delivery</li>
+                        <li>Performed security audits and risk assessments</li>
+                        <li>Organized professional conferences and training seminars</li>
+                        <li>Provided enhanced security services to airlines</li>
+                        <li>Conducted in-flight security escorts for special passengers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="education">
+        <div class="container">
+            <h2 class="section-title">Education & Qualifications</h2>
+            <div class="education-grid">
+                <div class="education-item">
+                    <h4>MA in Cultural and Heritage Tourism</h4>
+                    <div class="institution">Hong Kong Metropolitan University</div>
+                    <div class="period">September 2023 – July 2025</div>
+                    <p>Advanced postgraduate studies in cultural and heritage tourism management.</p>
+                </div>
+
+                <div class="education-item">
+                    <h4>Professional Diploma for Executives in Property Management (QF Level 5)</h4>
+                    <div class="institution">Hong Kong Metropolitan University Li Ka Shing School of Professional and Continuing Education</div>
+                    <div class="period">January 2023 – January 2024</div>
+                    <p>Executive-level qualification in property management and strategic operations.</p>
+                </div>
+
+                <div class="education-item">
+                    <h4>Professional Diploma in Property and Facilities Management (QF Level 4)</h4>
+                    <div class="institution">Hong Kong College of Technology</div>
+                    <div class="period">September 2018 – July 2020</div>
+                    <p>Comprehensive training in property and facilities management principles and practices.</p>
+                </div>
+
+                <div class="education-item">
+                    <h4>Bachelor of General Studies</h4>
+                    <div class="institution">The Open University of Hong Kong</div>
+                    <div class="period">March 2015 – August 2018</div>
+                    <p>Undergraduate degree with focus on business and management studies.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="skills">
+        <div class="container">
+            <h2 class="section-title">Skills & Competencies</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h4>Technical Skills</h4>
+                    <div class="skill-list">
+                        <span class="skill-tag">MS Word</span>
+                        <span class="skill-tag">MS Excel</span>
+                        <span class="skill-tag">PowerPoint</span>
+                        <span class="skill-tag">Internet</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h4>Professional Expertise</h4>
+                    <div class="skill-list">
+                        <span class="skill-tag">Property Management</span>
+                        <span class="skill-tag">Facilities Management</span>
+                        <span class="skill-tag">Tenant Relations</span>
+                        <span class="skill-tag">Emergency Response</span>
+                        <span class="skill-tag">Contractor Liaison</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h4>Languages</h4>
+                    <div class="skill-list">
+                        <span class="skill-tag">Chinese (Proficient)</span>
+                        <span class="skill-tag">English (Fair)</span>
+                        <span class="skill-tag">Putonghua</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certifications Section -->
+    <section class="certifications">
+        <div class="container">
+            <h2 class="section-title">Professional Certifications</h2>
+            <div class="cert-list">
+                <div class="cert-item">
+                    <div class="cert-icon">✓</div>
+                    <div>
+                        <strong>Certificate of Safety Supervisor</strong>
+                        <p>Professional safety certification for property and facilities management.</p>
+                    </div>
+                </div>
+
+                <div class="cert-item">
+                    <div class="cert-icon">✓</div>
+                    <div>
+                        <strong>Certificate of QAS Security Guard Training</strong>
+                        <p>Authorized security training certification from Quality Assurance Services.</p>
+                    </div>
+                </div>
+
+                <div class="cert-item">
+                    <div class="cert-icon">✓</div>
+                    <div>
+                        <strong>Construction Site Safety Card</strong>
+                        <p>Valid certification for construction site safety management and compliance.</p>
+                    </div>
+                </div>
+
+                <div class="cert-item">
+                    <div class="cert-icon">✓</div>
+                    <div>
+                        <strong>Driving License (Private & Light Goods Vehicle)</strong>
+                        <p>Valid Hong Kong driving license for private and commercial use.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Get In Touch</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 1rem;">I'm always interested in discussing property management opportunities, facilities optimization, or professional collaborations.</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <strong>📞 Phone</strong>
+                    <p><a href="tel:+85253661888">+852 5366 1888</a></p>
+                </div>
+                <div class="contact-item">
+                    <strong>✉️ Email</strong>
+                    <p><a href="mailto:cheung0502@yahoo.com">cheung0502@yahoo.com</a></p>
+                </div>
+                <div class="contact-item">
+                    <strong>📍 Location</strong>
+                    <p>Hong Kong</p>
+                </div>
+            </div>
+            <p style="opacity: 0.9; margin-top: 2rem;">Available for full-time opportunities and professional consulting. Negotiable start date.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Berlin Cheung. All rights reserved. | Professional Property Management & Facilities Specialist</p>
+    </footer>
+
+    <script>
+        // Smooth scroll behavior is handled by CSS
+        // Mobile menu functionality
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        const navMenu = document.querySelector('nav ul');
+
+        mobileToggle.addEventListener('click', () => {
+            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Close menu when link is clicked
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,819 +1,1028 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Berlin Cheung - Property Management & Facilities Professional</title>
+    <title>Berlin Cheung | Property & Facilities Management Professional</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        :root {
-            --primary-color: #1e3a5f;
-            --secondary-color: #2c5aa0;
-            --accent-color: #0091d9;
-            --light-bg: #f8fbff;
-            --text-dark: #1a1a1a;
-            --text-light: #555555;
-            --border-color: #e0e0e0;
-            --success-color: #27ae60;
+        .animate-fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            background-color: #ffffff;
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: none;
         }
-
-        nav .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            letter-spacing: 1px;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s ease;
-            font-size: 0.95rem;
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.3);
+            border-radius: 4px;
         }
-
-        nav a:hover {
-            color: var(--accent-color);
-        }
-
-        /* Mobile menu toggle */
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* Hero Section */
-        .hero {
-            margin-top: 70px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            padding: 4rem 2rem;
-            text-align: center;
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .hero-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            align-items: center;
-        }
-
-        .hero-text h1 {
-            font-size: 2.8rem;
-            margin-bottom: 0.5rem;
-            line-height: 1.2;
-        }
-
-        .hero-text p {
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
-            opacity: 0.95;
-        }
-
-        .hero-photos {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .photo-card {
-            background: white;
-            padding: 0.5rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .photo-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
-        }
-
-        .photo-card img {
-            width: 200px;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 8px;
-            display: block;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background-color: var(--accent-color);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .cta-button:hover {
-            background-color: #0078b8;
-            transform: scale(1.05);
-        }
-
-        /* About Section */
-        .about {
-            padding: 4rem 2rem;
-            background-color: var(--light-bg);
-            margin-top: 2rem;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            font-size: 2.2rem;
-            color: var(--primary-color);
-            margin-bottom: 2rem;
-            border-bottom: 3px solid var(--accent-color);
-            padding-bottom: 0.5rem;
-            display: inline-block;
-        }
-
-        .about-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 3rem;
-            margin-top: 2rem;
-        }
-
-        .about-item h3 {
-            color: var(--secondary-color);
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
-
-        .about-item p {
-            color: var(--text-light);
-            line-height: 1.8;
-        }
-
-        /* Experience Section */
-        .experience {
-            padding: 4rem 2rem;
-            background-color: white;
-        }
-
-        .timeline {
-            position: relative;
-            padding-left: 2rem;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: linear-gradient(180deg, var(--accent-color), var(--secondary-color));
-        }
-
-        .timeline-item {
-            margin-bottom: 2rem;
-            padding-left: 2rem;
-            position: relative;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -8px;
-            top: 0;
-            width: 16px;
-            height: 16px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 0 0 3px var(--accent-color);
-        }
-
-        .timeline-item h4 {
-            color: var(--primary-color);
-            font-size: 1.2rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .timeline-item .company {
-            color: var(--secondary-color);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .timeline-item .date {
-            color: #999;
-            font-size: 0.9rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .timeline-item ul {
-            margin-left: 1rem;
-            color: var(--text-light);
-            list-style-position: inside;
-        }
-
-        .timeline-item li {
-            margin-bottom: 0.4rem;
-        }
-
-        /* Education Section */
-        .education {
-            padding: 4rem 2rem;
-            background-color: var(--light-bg);
-        }
-
-        .education-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .education-item {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border-left: 4px solid var(--accent-color);
-            transition: transform 0.3s ease;
-        }
-
-        .education-item:hover {
-            transform: translateY(-3px);
-        }
-
-        .education-item h4 {
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        .education-item .institution {
-            color: var(--secondary-color);
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-        }
-
-        .education-item .period {
-            color: #999;
-            font-size: 0.85rem;
-            margin-bottom: 0.8rem;
-        }
-
-        /* Skills Section */
-        .skills {
-            padding: 4rem 2rem;
-            background: white;
-        }
-
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .skill-category {
-            background: var(--light-bg);
-            padding: 2rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .skill-category h4 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            font-size: 1.15rem;
-        }
-
-        .skill-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            justify-content: center;
-        }
-
-        .skill-tag {
-            background: var(--accent-color);
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        /* Certifications Section */
-        .certifications {
-            padding: 4rem 2rem;
-            background: linear-gradient(135deg, #f8fbff 0%, #e8f1ff 100%);
-        }
-
-        .cert-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .cert-item {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 6px;
-            border-left: 4px solid var(--success-color);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .cert-icon {
-            font-size: 1.8rem;
-            color: var(--success-color);
-        }
-
-        /* Contact Section */
-        .contact {
-            padding: 4rem 2rem;
-            background: var(--primary-color);
-            color: white;
-            text-align: center;
-        }
-
-        .contact h2 {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .contact-info {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            margin-top: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .contact-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1.5rem;
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
-        }
-
-        .contact-item strong {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        .contact-item a {
-            color: var(--accent-color);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .contact-item a:hover {
-            color: white;
-        }
-
-        /* Footer */
-        footer {
-            background: #0f1f38;
-            color: #999;
-            text-align: center;
-            padding: 2rem;
-            font-size: 0.9rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            nav ul {
-                display: none;
-            }
-
-            .mobile-menu-toggle {
-                display: block;
-            }
-
-            .hero-content {
-                grid-template-columns: 1fr;
-            }
-
-            .about-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .education-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .skills-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .contact-info {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-text h1 {
-                font-size: 2rem;
-            }
-
-            .photo-card img {
-                width: 150px;
-                height: 190px;
-            }
-
-            nav {
-                padding: 1rem;
-            }
-
-            .hero {
-                margin-top: 60px;
-                padding: 2rem 1rem;
-            }
-
-            .section-title {
-                font-size: 1.8rem;
-            }
-
-            .cert-list {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-photos {
-                flex-direction: column;
-            }
-
-            .photo-card img {
-                width: 120px;
-                height: 160px;
-            }
-
-            .hero-text h1 {
-                font-size: 1.5rem;
-            }
-
-            .hero-text p {
-                font-size: 1rem;
-            }
-
-            nav ul {
-                gap: 1rem;
-                font-size: 0.85rem;
-            }
-        }
-
-        /* Smooth Scrolling */
-        html {
-            scroll-behavior: smooth;
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 116, 139, 0.5);
         }
     </style>
 </head>
-<body>
-    <!-- Navigation -->
-    <nav>
-        <div class="logo">Berlin Cheung</div>
-        <ul>
-            <li><a href="#about">About</a></li>
-            <li><a href="#experience">Experience</a></li>
-            <li><a href="#education">Education</a></li>
-            <li><a href="#skills">Skills</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-        <button class="mobile-menu-toggle">☰</button>
-    </nav>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans transition-colors duration-300 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1>Berlin Cheung</h1>
-                <p>Property Management & Facilities Professional</p>
-                <p style="font-size: 1rem; margin-top: 1rem;">Dedicated to excellence in property asset management, tenant services, and facilities oversight with 15+ years of progressive experience across leading Hong Kong organizations.</p>
-                <a href="#contact" class="cta-button">Get In Touch</a>
-            </div>
-            <div class="hero-photos">
-            
-                <div class="photo-card">
-            <div class="hero-image">
-                <img src="https://i.postimg.cc/y8QBxDK6/p1.jpg" alt="Berlin Cheung">
-            </div>
-        </div>
-    </section>
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-200 dark:border-slate-800/80 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#home" onclick="switchPage('home'); return false;" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform">
+                    B
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">Berlin Cheung</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium" data-i18n="logoSubtitle">Property & Facilities Expert</span>
+                </div>
+            </a>
 
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <h2 class="section-title">About Me</h2>
-            <div class="about-grid">
-                <div class="about-item">
-                    <h3>Professional Background</h3>
-                    <p>Throughout my career spanning more than 7 years in property management, I have gained valuable working experience in addressing owners' and tenants' complaints, handling financial matters, preparing and maintaining property-related documents, managing emergency cases, liaising with contractors, and overseeing contractor performance. My experience combined with my education background demonstrates a commitment to excellence in property and facilities management.</p>
-                </div>
-                <div class="about-item">
-                    <h3>Core Strengths</h3>
-                    <p><strong>Self-initiative & Leadership:</strong> Energetic professional with strong presentation skills, responsible and independent, demonstrating excellent adaptability.<br><br><strong>Expertise:</strong> Property asset management, tenant relations, facilities coordination, documentation, emergency response, contractor liaison, and stakeholder engagement.</p>
-                </div>
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-1 bg-slate-200/70 dark:bg-slate-900/60 p-1.5 rounded-full border border-slate-300/60 dark:border-slate-800">
+                <button onclick="switchPage('home')" id="nav-home" class="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 text-indigo-600 dark:text-white" data-i18n="navHome">首頁</button>
+                <button onclick="switchPage('about')" id="nav-about" class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-white" data-i18n="navAbout">關於我與經歷</button>
+                <button onclick="switchPage('portfolio')" id="nav-portfolio" class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-white" data-i18n="navPortfolio">專業範疇</button>
+                <button onclick="switchPage('contact')" id="nav-contact" class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-white" data-i18n="navContact">聯絡我</button>
+            </nav>
+
+            <!-- Right Actions: Language Switcher, Dark Mode & Mobile Menu Button -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Language Switcher Button -->
+                <button onclick="toggleLanguage()" aria-label="切換語言 / Toggle Language" class="px-3 py-2 rounded-xl bg-slate-200/70 dark:bg-slate-900 flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-800 transition-colors border border-slate-300/60 dark:border-slate-800">
+                    <i class="fa-solid fa-globe text-indigo-500"></i>
+                    <span id="lang-label">EN</span>
+                </button>
+
+                <!-- Dark Mode Toggle -->
+                <button onclick="toggleDarkMode()" aria-label="切換深色/明亮模式" class="w-10 h-10 rounded-xl bg-slate-200/70 dark:bg-slate-900 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-800 transition-colors border border-slate-300/60 dark:border-slate-800">
+                    <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
+                </button>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" aria-label="手機選單" class="md:hidden w-10 h-10 rounded-xl bg-slate-200/70 dark:bg-slate-900 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-800 transition-colors border border-slate-300/60 dark:border-slate-800">
+                    <i id="mobile-menu-icon" class="fa-solid fa-bars text-sm"></i>
+                </button>
             </div>
         </div>
-    </section>
 
-    <!-- Experience Section -->
-    <section id="experience" class="experience">
-        <div class="container">
-            <h2 class="section-title">Professional Experience</h2>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <h4>Property Asset Officer</h4>
-                    <div class="company">Urban Property Management Limited</div>
-                    <div class="date">April 2024 – Present</div>
-                    <ul>
-                        <li>Handle residents' complaints and enquiries</li>
-                        <li>Reflect residents' opinions to different departments</li>
-                        <li>Coordinate with colleagues from different departments</li>
-                        <li>Manage daily documents including notices, follow-ups, record keeping, and deposit refund procedures</li>
-                        <li>Monitor daily estate operations</li>
-                    </ul>
-                </div>
-
-                <div class="timeline-item">
-                    <h4>Executive Assistant, Transport Department Vehicle Examination Complex</h4>
-                    <div class="company">Allegro (HK) Limited</div>
-                    <div class="date">May 2023 – October 2023</div>
-                    <ul>
-                        <li>Supervised and coordinated daily premises maintenance and repairs</li>
-                        <li>Reviewed electricity and water supply consumption</li>
-                        <li>Proposed energy and water saving methods</li>
-                        <li>Supervised service agents and coordinated contractor representatives</li>
-                        <li>Coordinated with government representatives and managed space planning</li>
-                    </ul>
-                </div>
-
-                <div class="timeline-item">
-                    <h4>Senior Officer, Facilities Management</h4>
-                    <div class="company">New World Facilities Management Company Limited</div>
-                    <div class="date">December 2021 – May 2023</div>
-                    <ul>
-                        <li>Maintained smooth day-to-day operations and achieved KPI targets</li>
-                        <li>Supervised service teams and contractors for facilities management</li>
-                        <li>Set up and reviewed departmental policies and procedures</li>
-                        <li>Prepared annual budgets, reports, and improvement proposals</li>
-                        <li>Handled emergency incidents and customer complaints</li>
-                    </ul>
-                </div>
-
-                <div class="timeline-item">
-                    <h4>Tenant Services Officer</h4>
-                    <div class="company">Miramar Hotel and Property Management Company Limited</div>
-                    <div class="date">June 2019 – November 2021</div>
-                    <ul>
-                        <li>Handled tenant enquiries, requests, and emergency cases</li>
-                        <li>Coordinated with contractors and monitored work progress</li>
-                        <li>Oversaw property maintenance, cleaning, and security services</li>
-                        <li>Managed premise handover and takeover procedures</li>
-                        <li>Prepared monthly reports and maintained excellent tenant relations</li>
-                    </ul>
-                </div>
-
-                <div class="timeline-item">
-                    <h4>Assistant Property Officer</h4>
-                    <div class="company">Guardian Property Management Limited</div>
-                    <div class="date">July 2016 – March 2019</div>
-                    <ul>
-                        <li>Assisted Property Manager in day-to-day operations and liaison</li>
-                        <li>Built and maintained relationships with tenants and owners</li>
-                        <li>Attended management and owners' committee meetings</li>
-                        <li>Monitored on-site staff and contractor performance</li>
-                        <li>Supervised property maintenance, cleaning, and security services</li>
-                    </ul>
-                </div>
-
-                <div class="timeline-item">
-                    <h4>Security Officer</h4>
-                    <div class="company">Avseco</div>
-                    <div class="date">May 2010 – June 2016</div>
-                    <ul>
-                        <li>Conducted armored vehicle and valuable cargo escort and delivery</li>
-                        <li>Performed security audits and risk assessments</li>
-                        <li>Organized professional conferences and training seminars</li>
-                        <li>Provided enhanced security services to airlines</li>
-                        <li>Conducted in-flight security escorts for special passengers</li>
-                    </ul>
-                </div>
-            </div>
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-t border-slate-200 dark:border-slate-800 px-4 pt-3 pb-5 flex flex-col gap-2">
+            <button onclick="switchPage('home'); toggleMobileMenu();" class="text-left px-4 py-3 rounded-xl font-medium hover:bg-indigo-500/10 hover:text-indigo-600 transition-colors" data-i18n="navHome">首頁</button>
+            <button onclick="switchPage('about'); toggleMobileMenu();" class="text-left px-4 py-3 rounded-xl font-medium hover:bg-indigo-500/10 hover:text-indigo-600 transition-colors" data-i18n="navAbout">關於我與經歷</button>
+            <button onclick="switchPage('portfolio'); toggleMobileMenu();" class="text-left px-4 py-3 rounded-xl font-medium hover:bg-indigo-500/10 hover:text-indigo-600 transition-colors" data-i18n="navPortfolio">專業範疇</button>
+            <button onclick="switchPage('contact'); toggleMobileMenu();" class="text-left px-4 py-3 rounded-xl font-medium hover:bg-indigo-500/10 hover:text-indigo-600 transition-colors" data-i18n="navContact">聯絡我</button>
         </div>
-    </section>
+    </header>
 
-    <!-- Education Section -->
-    <section id="education" class="education">
-        <div class="container">
-            <h2 class="section-title">Education & Qualifications</h2>
-            <div class="education-grid">
-                <div class="education-item">
-                    <h4>MA in Cultural and Heritage Tourism</h4>
-                    <div class="institution">Hong Kong Metropolitan University</div>
-                    <div class="period">September 2023 – July 2025</div>
-                    <p>Advanced postgraduate studies in cultural and heritage tourism management.</p>
-                </div>
+    <main class="flex-grow">
+        
+        <!-- 1. HOME PAGE -->
+        <section id="page-home" class="page-section animate-fade-in">
+            <!-- Hero Section -->
+            <div class="relative overflow-hidden pt-16 pb-24 md:pt-24 md:pb-32">
+                <!-- Background Glowing Orbs -->
+                <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-tr from-indigo-500/15 to-purple-500/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+                <div class="absolute top-1/3 right-10 w-[300px] h-[300px] bg-gradient-to-br from-pink-500/10 to-blue-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
-                <div class="education-item">
-                    <h4>Professional Diploma for Executives in Property Management (QF Level 5)</h4>
-                    <div class="institution">Hong Kong Metropolitan University Li Ka Shing School of Professional and Continuing Education</div>
-                    <div class="period">January 2023 – January 2024</div>
-                    <p>Executive-level qualification in property management and strategic operations.</p>
-                </div>
-
-                <div class="education-item">
-                    <h4>Professional Diploma in Property and Facilities Management (QF Level 4)</h4>
-                    <div class="institution">Hong Kong College of Technology</div>
-                    <div class="period">September 2018 – July 2020</div>
-                    <p>Comprehensive training in property and facilities management principles and practices.</p>
-                </div>
-
-                <div class="education-item">
-                    <h4>Bachelor of General Studies</h4>
-                    <div class="institution">The Open University of Hong Kong</div>
-                    <div class="period">March 2015 – August 2018</div>
-                    <p>Undergraduate degree with focus on business and management studies.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Skills Section -->
-    <section id="skills" class="skills">
-        <div class="container">
-            <h2 class="section-title">Skills & Competencies</h2>
-            <div class="skills-grid">
-                <div class="skill-category">
-                    <h4>Technical Skills</h4>
-                    <div class="skill-list">
-                        <span class="skill-tag">MS Word</span>
-                        <span class="skill-tag">MS Excel</span>
-                        <span class="skill-tag">PowerPoint</span>
-                        <span class="skill-tag">Internet</span>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-sm font-semibold mb-8 animate-pulse">
+                        <i class="fa-solid fa-shield-halved"></i> <span data-i18n="heroBadge">專業物業資產與設施管理諮詢</span>
                     </div>
-                </div>
+                    
+                    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight mb-6">
+                        <span data-i18n="heroTitlePre">致力於卓越的</span> <span class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent" data-i18n="heroTitleHighlight">物業資產與設施管理</span>
+                    </h1>
 
-                <div class="skill-category">
-                    <h4>Professional Expertise</h4>
-                    <div class="skill-list">
-                        <span class="skill-tag">Property Management</span>
-                        <span class="skill-tag">Facilities Management</span>
-                        <span class="skill-tag">Tenant Relations</span>
-                        <span class="skill-tag">Emergency Response</span>
-                        <span class="skill-tag">Contractor Liaison</span>
-                    </div>
-                </div>
+                    <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-10 min-h-[4rem] flex flex-wrap items-center justify-center gap-1">
+                        <span data-i18n="heroSubtitlePre">擁有 15+ 年香港各大知名機構之</span>&nbsp;<span id="typing-text" class="text-indigo-600 dark:text-indigo-400 font-semibold border-b-2 border-indigo-500"></span><span class="animate-pulse">|</span>
+                    </p>
 
-                <div class="skill-category">
-                    <h4>Languages</h4>
-                    <div class="skill-list">
-                        <span class="skill-tag">Chinese (Proficient)</span>
-                        <span class="skill-tag">English (Fair)</span>
-                        <span class="skill-tag">Putonghua</span>
+                    <!-- CTAs -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <button onclick="switchPage('portfolio')" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                            <span data-i18n="btnPortfolio">查看專業範疇</span>
+                            <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </button>
+                        <button onclick="switchPage('contact')" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel font-semibold hover:bg-slate-200/80 dark:hover:bg-slate-800/80 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 border border-slate-300 dark:border-slate-700">
+                            <span data-i18n="btnContact">與我取得聯繫</span>
+                            <i class="fa-regular fa-paper-plane text-sm"></i>
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Certifications Section -->
-    <section class="certifications">
-        <div class="container">
-            <h2 class="section-title">Professional Certifications</h2>
-            <div class="cert-list">
-                <div class="cert-item">
-                    <div class="cert-icon">✓</div>
-                    <div>
-                        <strong>Certificate of Safety Supervisor</strong>
-                        <p>Professional safety certification for property and facilities management.</p>
-                    </div>
+            <!-- Highlight Summary Section -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+                <div class="text-center mb-12">
+                    <h2 class="text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 font-bold mb-3">Core Expertise</h2>
+                    <h3 class="text-2xl sm:text-3xl font-bold" data-i18n="coreExpertiseTitle">核心專業與服務承諾</h3>
                 </div>
 
-                <div class="cert-item">
-                    <div class="cert-icon">✓</div>
-                    <div>
-                        <strong>Certificate of QAS Security Guard Training</strong>
-                        <p>Authorized security training certification from Quality Assurance Services.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Highlight 1 -->
+                    <div class="glass-panel p-8 rounded-2xl hover:border-indigo-500/50 transition-all duration-300 group hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-building-user"></i>
+                        </div>
+                        <h4 class="text-xl font-bold mb-3" data-i18n="card1Title">物業資產與租戶服務</h4>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed" data-i18n="card1Desc">
+                            專精處理業主及租戶查詢與投訴、物業文件起草與維護、交吉手續交接，並提供卓越的租戶關係維護與滿意度提升。
+                        </p>
                     </div>
-                </div>
 
-                <div class="cert-item">
-                    <div class="cert-icon">✓</div>
-                    <div>
-                        <strong>Construction Site Safety Card</strong>
-                        <p>Valid certification for construction site safety management and compliance.</p>
+                    <!-- Highlight 2 -->
+                    <div class="glass-panel p-8 rounded-2xl hover:border-indigo-500/50 transition-all duration-300 group hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </div>
+                        <h4 class="text-xl font-bold mb-3" data-i18n="card2Title">設施管理與承辦商監督</h4>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed" data-i18n="card2Desc">
+                            統籌日常設施維護保養、水電消耗審查與節能方案、服務承辦商績效監督、預算編製及合規安全管理。
+                        </p>
                     </div>
-                </div>
 
-                <div class="cert-item">
-                    <div class="cert-icon">✓</div>
-                    <div>
-                        <strong>Driving License (Private & Light Goods Vehicle)</strong>
-                        <p>Valid Hong Kong driving license for private and commercial use.</p>
+                    <!-- Highlight 3 -->
+                    <div class="glass-panel p-8 rounded-2xl hover:border-indigo-500/50 transition-all duration-300 group hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-xl bg-pink-500/10 text-pink-600 dark:text-pink-400 flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <h4 class="text-xl font-bold mb-3" data-i18n="card3Title">緊急事故應變與領導統御</h4>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed" data-i18n="card3Desc">
+                            具備高度應變能力與獨立危機處理經驗，能冷靜應對突發緊急事件、跨部門協調及利益相關者溝通。
+                        </p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2>Get In Touch</h2>
-            <p style="font-size: 1.1rem; margin-bottom: 1rem;">I'm always interested in discussing property management opportunities, facilities optimization, or professional collaborations.</p>
-            <div class="contact-info">
-                <div class="contact-item">
-                    <strong>📞 Phone</strong>
-                    <p><a href="tel:+85253661888">+852 5366 1888</a></p>
+        <!-- 2. ABOUT & EXPERIENCE PAGE -->
+        <section id="page-about" class="page-section hidden animate-fade-in py-16 md:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 font-bold mb-3 block">About Me & Career</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-4" data-i18n="aboutHeaderTitle">個人背景與職涯發展歷程</h2>
+                    <p class="text-slate-600 dark:text-slate-400" data-i18n="aboutHeaderSubtitle">擁有超過 15 年香港各大型機構資歷，以嚴謹、責任感與高效協調能力聞名於業界。</p>
                 </div>
-                <div class="contact-item">
-                    <strong>✉️ Email</strong>
-                    <p><a href="mailto:cheung0502@yahoo.com">cheung0502@yahoo.com</a></p>
+
+                <!-- Bio Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
+                    <!-- Profile Image displayed at natural size & proportions -->
+                    <div class="lg:col-span-5 relative flex justify-center">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-3xl blur-xl opacity-20 -z-10 m-auto w-3/4 h-3/4"></div>
+                        <div class="glass-panel p-3 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden inline-flex items-center justify-center">
+                            <img src="https://i.postimg.cc/y8QBxDK6/p1.jpg" alt="Berlin Cheung" class="w-auto h-auto max-w-[260px] sm:max-w-[300px] max-h-[380px] object-contain rounded-2xl shadow-sm" onerror="this.src='https://placehold.co/400x500/312e81/ffffff?text=Berlin+Cheung'">
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 flex flex-col gap-6">
+                        <h3 class="text-2xl sm:text-3xl font-bold leading-snug">
+                            <span data-i18n="bioHeadingPre">追求卓越的資產與設施管理專業人士</span> <span class="text-indigo-600 dark:text-indigo-400">Berlin Cheung</span>
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed" data-i18n="bioPara1">
+                            在物業管理與設施營運領域擁有超過 7 年的深厚經驗，並具備總計 15 年以上的多元管理與保安督導資歷。擅長處理業主與租戶投訴、財務協調、物業文件草擬、緊急事故處理及承辦商績效監督。
+                        </p>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed" data-i18n="bioPara2">
+                            具備極強的自我主動性、領導力與獨立應變能力，能為企業及住戶打造安全、高效且和諧的環境。
+                        </p>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
+                            <div class="glass-panel p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                                <span class="block text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mb-1">15+</span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium" data-i18n="stat1">年業界累積資歷</span>
+                            </div>
+                            <div class="glass-panel p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                                <span class="block text-3xl font-extrabold text-purple-600 dark:text-purple-400 mb-1">7+</span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium" data-i18n="stat2">年物業管理實戰</span>
+                            </div>
+                            <div class="glass-panel p-4 rounded-xl border border-slate-200 dark:border-slate-800 col-span-2 sm:col-span-1">
+                                <span class="block text-3xl font-extrabold text-pink-600 dark:text-pink-400 mb-1">QF L5</span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium" data-i18n="stat3">專業資歷架構認證</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="contact-item">
-                    <strong>📍 Location</strong>
-                    <p>Hong Kong</p>
+
+                <!-- Skill & Competency Tags -->
+                <div class="mb-24">
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-indigo-600 dark:text-indigo-400"></i> <span data-i18n="skillsHeader">核心專業技能與資歷</span>
+                    </h3>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="px-4 py-2.5 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 text-sm font-semibold flex items-center gap-2 hover:border-indigo-500 transition-colors">
+                            <i class="fa-solid fa-building text-indigo-500"></i> <span data-i18n="skill1">物業資產管理 (Property Asset Management)</span>
+                        </span>
+                        <span class="px-4 py-2.5 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 text-sm font-semibold flex items-center gap-2 hover:border-indigo-500 transition-colors">
+                            <i class="fa-solid fa-hotel text-purple-500"></i> <span data-i18n="skill2">設施管理與維護 (Facilities Management)</span>
+                        </span>
+                        <span class="px-4 py-2.5 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 text-sm font-semibold flex items-center gap-2 hover:border-indigo-500 transition-colors">
+                            <i class="fa-solid fa-comments text-pink-500"></i> <span data-i18n="skill3">租戶關係維護 (Tenant Relations)</span>
+                        </span>
+                        <span class="px-4 py-2.5 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 text-sm font-semibold flex items-center gap-2 hover:border-indigo-500 transition-colors">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> <span data-i18n="skill4">緊急事故應變 (Emergency Response)</span>
+                        </span>
+                        <span class="px-4 py-2.5 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 text-sm font-semibold flex items-center gap-2 hover:border-indigo-500 transition-colors">
+                            <i class="fa-solid fa-handshake text-emerald-500"></i> <span data-i18n="skill5">承辦商統籌與監督 (Contractor Liaison)</span>
+                        </span>
+                        <span class="px-4 py-2.5 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 text-sm font-semibold flex items-center gap-2 hover:border-indigo-500 transition-colors">
+                            <i class="fa-solid fa-file-invoice-dollar text-blue-500"></i> <span data-i18n="skill6">預算編製與營運報告 (Budgeting & Reporting)</span>
+                        </span>
+                        <span class="px-4 py-2.5 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 text-sm font-semibold flex items-center gap-2 hover:border-indigo-500 transition-colors">
+                            <i class="fa-solid fa-laptop text-cyan-500"></i> MS Office (Word, Excel, PowerPoint)
+                        </span>
+                        <span class="px-4 py-2.5 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 text-sm font-semibold flex items-center gap-2 hover:border-indigo-500 transition-colors">
+                            <i class="fa-solid fa-language text-teal-500"></i> <span data-i18n="skillLang">中文 (流利) / 英文 (一般) / 普通話</span>
+                        </span>
+                    </div>
+
+                    <!-- Certifications Sub-block -->
+                    <div class="mt-8 p-6 rounded-2xl glass-panel border border-slate-200 dark:border-slate-800">
+                        <h4 class="font-bold text-sm text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-4" data-i18n="certHeader">專業證照與資格</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-certificate text-indigo-500 text-lg"></i>
+                                <span data-i18n="cert1">安全督導員證書 (Safety Supervisor)</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid id-card text-purple-500 text-lg"></i>
+                                <span data-i18n="cert2">QAS 保安培訓認證</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-hard-hat text-amber-500 text-lg"></i>
+                                <span data-i18n="cert3">建造業平安卡 (綠卡)</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-car text-emerald-500 text-lg"></i>
+                                <span data-i18n="cert4">香港駕駛執照 (私家車及輕型貨車)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Section -->
+                <div>
+                    <h3 class="text-xl font-bold mb-8 flex items-center gap-2">
+                        <i class="fa-solid fa-timeline text-indigo-600 dark:text-indigo-400"></i> <span data-i18n="timelineHeader">職涯發展與學歷歷程</span>
+                    </h3>
+                    
+                    <div class="relative border-l-2 border-indigo-500/30 ml-4 pl-6 space-y-12" id="timeline-container">
+                        <!-- Experience 1 -->
+                        <div class="relative group">
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-indigo-600 border-4 border-slate-50 dark:border-slate-950 group-hover:scale-125 transition-transform"></div>
+                            <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">April 2024 – Present</span>
+                            <h4 class="text-xl font-bold mt-1">Property Asset Officer</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">Urban Property Management Limited</p>
+                            <ul class="text-slate-600 dark:text-slate-400 text-sm space-y-1.5 list-disc list-inside" data-i18n-list="exp1">
+                                <li>處理居民投訴及查詢，並向上級及各部門反映意見。</li>
+                                <li>統籌日常跨部門營運及各項工作。</li>
+                                <li>管理日常物業文件，包括通告發布、跟進事項、記錄保存及按金退還程序。</li>
+                                <li>監督日常屋苑物業營運。</li>
+                            </ul>
+                        </div>
+
+                        <!-- Experience 2 -->
+                        <div class="relative group">
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-purple-600 border-4 border-slate-50 dark:border-slate-950 group-hover:scale-125 transition-transform"></div>
+                            <span class="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest">May 2023 – October 2023</span>
+                            <h4 class="text-xl font-bold mt-1">Executive Assistant, Transport Department Vehicle Examination Complex</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">Allegro (HK) Limited</p>
+                            <ul class="text-slate-600 dark:text-slate-400 text-sm space-y-1.5 list-disc list-inside" data-i18n-list="exp2">
+                                <li>監督及統籌日常處所之維修保養工程。</li>
+                                <li>審查水電消耗並提出節能省水方案。</li>
+                                <li>監督服務代理並協調承辦商代表。</li>
+                                <li>與政府代表協調並處理空間規劃事宜。</li>
+                            </ul>
+                        </div>
+
+                        <!-- Experience 3 -->
+                        <div class="relative group">
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-pink-600 border-4 border-slate-50 dark:border-slate-950 group-hover:scale-125 transition-transform"></div>
+                            <span class="text-xs font-bold text-pink-600 dark:text-pink-400 uppercase tracking-widest">December 2021 – May 2023</span>
+                            <h4 class="text-xl font-bold mt-1">Senior Officer, Facilities Management</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">New World Facilities Management Company Limited</p>
+                            <ul class="text-slate-600 dark:text-slate-400 text-sm space-y-1.5 list-disc list-inside" data-i18n-list="exp3">
+                                <li>維持日常營運順暢並達成關鍵績效指標 (KPI) 目標。</li>
+                                <li>監督服務團隊及設施管理承辦商。</li>
+                                <li>建立及檢討部門政策與工作程序。</li>
+                                <li>編製年度預算、營運報告及改善建議書，處理緊急事故與客戶投訴。</li>
+                            </ul>
+                        </div>
+
+                        <!-- Experience 4 -->
+                        <div class="relative group">
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-blue-600 border-4 border-slate-50 dark:border-slate-950 group-hover:scale-125 transition-transform"></div>
+                            <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">June 2019 – November 2021</span>
+                            <h4 class="text-xl font-bold mt-1">Tenant Services Officer</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">Miramar Hotel and Property Management Company Limited</p>
+                            <ul class="text-slate-600 dark:text-slate-400 text-sm space-y-1.5 list-disc list-inside" data-i18n-list="exp4">
+                                <li>處理租戶查詢、請求及緊急事故。</li>
+                                <li>與承辦商協調並監察項目及工程進度。</li>
+                                <li>監督物業維修、清潔及保安服務，管理交吉交接程序。</li>
+                                <li>編製月度報告並建立卓越租戶關係。</li>
+                            </ul>
+                        </div>
+
+                        <!-- Experience 5 -->
+                        <div class="relative group">
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-teal-600 border-4 border-slate-50 dark:border-slate-950 group-hover:scale-125 transition-transform"></div>
+                            <span class="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-widest">July 2016 – March 2019</span>
+                            <h4 class="text-xl font-bold mt-1">Assistant Property Officer</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">Guardian Property Management Limited</p>
+                            <ul class="text-slate-600 dark:text-slate-400 text-sm space-y-1.5 list-disc list-inside" data-i18n-list="exp5">
+                                <li>協助物業經理處理日常營運及利益相關者聯絡。</li>
+                                <li>與租戶及業主建立並維護良好關係，出席管理委員會會議。</li>
+                                <li>監督駐場員工及承辦商表現，監管維修、清潔及保安運作。</li>
+                            </ul>
+                        </div>
+
+                        <!-- Experience 6 -->
+                        <div class="relative group">
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-amber-600 border-4 border-slate-50 dark:border-slate-950 group-hover:scale-125 transition-transform"></div>
+                            <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">May 2010 – June 2016</span>
+                            <h4 class="text-xl font-bold mt-1">Security Officer</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">Avseco</p>
+                            <ul class="text-slate-600 dark:text-slate-400 text-sm space-y-1.5 list-disc list-inside" data-i18n-list="exp6">
+                                <li>執行裝甲車及貴重貨物護衛與運送。</li>
+                                <li>進行保安審計與風險評估，組織專業會議及培訓研討會。</li>
+                                <li>為航空公司提供加強保安服務及特別旅客之機艙保安護衛。</li>
+                            </ul>
+                        </div>
+
+                        <!-- Education 1 -->
+                        <div class="relative group">
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-slate-500 border-4 border-slate-50 dark:border-slate-950 group-hover:scale-125 transition-transform"></div>
+                            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">September 2023 – July 2025</span>
+                            <h4 class="text-xl font-bold mt-1">MA in Cultural and Heritage Tourism</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">Hong Kong Metropolitan University</p>
+                        </div>
+
+                        <!-- Education 2 -->
+                        <div class="relative group">
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-slate-500 border-4 border-slate-50 dark:border-slate-950 group-hover:scale-125 transition-transform"></div>
+                            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">January 2023 – January 2024</span>
+                            <h4 class="text-xl font-bold mt-1">Professional Diploma for Executives in Property Management (QF Level 5)</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">HKMU Li Ka Shing School of Professional and Continuing Education</p>
+                        </div>
+
+                        <!-- Education 3 -->
+                        <div class="relative group">
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-slate-500 border-4 border-slate-50 dark:border-slate-950 group-hover:scale-125 transition-transform"></div>
+                            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">September 2018 – July 2020</span>
+                            <h4 class="text-xl font-bold mt-1">Professional Diploma in Property and Facilities Management (QF Level 4)</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">Hong Kong College of Technology</p>
+                        </div>
+
+                        <!-- Education 4 -->
+                        <div class="relative group">
+                            <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-slate-500 border-4 border-slate-50 dark:border-slate-950 group-hover:scale-125 transition-transform"></div>
+                            <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">March 2015 – August 2018</span>
+                            <h4 class="text-xl font-bold mt-1">Bachelor of General Studies</h4>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">The Open University of Hong Kong</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 3. PORTFOLIO / PROJECTS PAGE -->
+        <section id="page-portfolio" class="page-section hidden animate-fade-in py-16 md:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 font-bold mb-3 block">Professional Domains</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-4" data-i18n="portHeaderTitle">核心物業與設施管理範疇</h2>
+                    <p class="text-slate-600 dark:text-slate-400" data-i18n="portHeaderSubtitle">展示各項重大專案經驗與管理範疇，點擊「了解更多」查看詳細執行職責。</p>
+                </div>
+
+                <!-- Projects Card Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- Domain 1 -->
+                    <div class="glass-panel rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 transition-all duration-300 group flex flex-col">
+                        <div class="relative h-60 bg-gradient-to-tr from-indigo-900 to-purple-900 overflow-hidden flex items-center justify-center">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-500/20 via-transparent to-transparent opacity-60"></div>
+                            <div class="text-center p-6 relative z-10 group-hover:scale-105 transition-transform duration-500">
+                                <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md mx-auto flex items-center justify-center text-white text-3xl font-bold mb-3 shadow-lg border border-white/20">
+                                    <i class="fa-solid fa-city"></i>
+                                </div>
+                                <h4 class="text-white text-xl font-bold tracking-tight" data-i18n="p1Title">商住宅物業資產統籌</h4>
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-semibold">Urban Property</span>
+                                <span class="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs font-semibold">Miramar Hotel</span>
+                                <span class="px-2.5 py-1 rounded-md bg-pink-500/10 text-pink-600 dark:text-pink-400 text-xs font-semibold">Guardian</span>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 flex-grow leading-relaxed" data-i18n="p1Desc">
+                                涵蓋住宅與商業物業之日常資產管理、住戶/租戶投訴處理、物業文件檔案與交吉交接流程監督。
+                            </p>
+                            <button onclick="openProjectModal(currentLang === 'en' ? 'Residential & Commercial Property Asset Coordination' : '商住宅物業資產統籌與營運', currentLang === 'en' ? 'Served in property asset and tenant services roles at Urban Property, Miramar, and Guardian. Key responsibilities include handling owner/tenant inquiries and complaints, coordinating cross-department operations, managing notices, record keeping, and deposit refunds to ensure high efficiency.' : '在 Urban Property、Miramar 及 Guardian 等機構擔任物業資產及租戶服務職務。主要職責包括處理業主與租戶查詢投訴、統籌跨部門營運、管理日常通告、檔案記錄與按金退還，並確保屋苑與商廈日常高效運作。', ['Property Ops', 'Tenant Relations', 'Documentation', 'Handover'])" class="w-full py-3 rounded-xl bg-slate-200/70 dark:bg-slate-800/80 hover:bg-indigo-600 hover:text-white transition-all font-semibold text-sm flex items-center justify-center gap-2">
+                                <span data-i18n="btnLearnMore">了解更多管理職責</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Domain 2 -->
+                    <div class="glass-panel rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 transition-all duration-300 group flex flex-col">
+                        <div class="relative h-60 bg-gradient-to-tr from-blue-900 to-teal-900 overflow-hidden flex items-center justify-center">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-teal-500/20 via-transparent to-transparent opacity-60"></div>
+                            <div class="text-center p-6 relative z-10 group-hover:scale-105 transition-transform duration-500">
+                                <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md mx-auto flex items-center justify-center text-white text-3xl font-bold mb-3 shadow-lg border border-white/20">
+                                    <i class="fa-solid fa-building-shield"></i>
+                                </div>
+                                <h4 class="text-white text-xl font-bold tracking-tight" data-i18n="p2Title">大型設施維護與節能方案</h4>
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-semibold">New World FM</span>
+                                <span class="px-2.5 py-1 rounded-md bg-teal-500/10 text-teal-600 dark:text-teal-400 text-xs font-semibold">Transport Dept Complex</span>
+                                <span class="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs font-semibold">Allegro (HK)</span>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 flex-grow leading-relaxed" data-i18n="p2Desc">
+                                於運輸署車輛檢驗綜合大樓及新世界設施管理公司擔任要職，主導設施維護、水電消耗審查、節能方案及合約監督。
+                            </p>
+                            <button onclick="openProjectModal(currentLang === 'en' ? 'Large-scale Facilities Maintenance & Energy Saving Schemes' : '大型設施維護與節能方案管理', currentLang === 'en' ? 'Served at New World Facilities Management and Transport Department Vehicle Examination Complex (Allegro). Supervised premises maintenance, reviewed water & electricity consumption, proposed energy-saving measures, coordinated with government reps, and managed budgets.' : '於新世界設施管理及運輸署車輛檢驗綜合大樓（Allegro）負責監督日常處所維修保養、審查水電消耗並推行節能省水措施、統籌服務代理與政府代表協調，並編製年度預算與營運報告。', ['Facilities Management', 'Energy Saving', 'Contract Supervision', 'Budgeting'])" class="w-full py-3 rounded-xl bg-slate-200/70 dark:bg-slate-800/80 hover:bg-indigo-600 hover:text-white transition-all font-semibold text-sm flex items-center justify-center gap-2">
+                                <span data-i18n="btnLearnMore">了解更多管理職責</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Domain 3 -->
+                    <div class="glass-panel rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 transition-all duration-300 group flex flex-col">
+                        <div class="relative h-60 bg-gradient-to-tr from-purple-900 to-pink-900 overflow-hidden flex items-center justify-center">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-500/20 via-transparent to-transparent opacity-60"></div>
+                            <div class="text-center p-6 relative z-10 group-hover:scale-105 transition-transform duration-500">
+                                <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md mx-auto flex items-center justify-center text-white text-3xl font-bold mb-3 shadow-lg border border-white/20">
+                                    <i class="fa-solid fa-headset"></i>
+                                </div>
+                                <h4 class="text-white text-xl font-bold tracking-tight" data-i18n="p3Title">租戶關係與緊急應變</h4>
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-2.5 py-1 rounded-md bg-pink-500/10 text-pink-600 dark:text-pink-400 text-xs font-semibold">Tenant Services</span>
+                                <span class="px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-semibold">Emergency Response</span>
+                                <span class="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs font-semibold">Contractor Liaison</span>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 flex-grow leading-relaxed" data-i18n="p3Desc">
+                                專注於租戶日常查詢及緊急事件處理、承辦商進度監控、屋苑清潔與保安服務統籌。
+                            </p>
+                            <button onclick="openProjectModal(currentLang === 'en' ? 'Tenant Relations & Emergency Crisis Response' : '租戶關係與緊急應變危機處理', currentLang === 'en' ? 'As a Tenant Services Officer and Senior Property Personnel, specialized in handling urgent incidents, coordinating maintenance contractors, supervising cleaning and security, and cultivating long-term tenant trust.' : '作為租戶服務主任及資深物業管理人員，擅長處理突發緊急事故、協調維修保養承辦商並監控工程進度，監督日常清潔與保安運作，建立長期穩固的優質租戶關係。', ['Tenant Services', 'Emergency Response', 'Contractor Liaison', 'Crisis Management'])" class="w-full py-3 rounded-xl bg-slate-200/70 dark:bg-slate-800/80 hover:bg-indigo-600 hover:text-white transition-all font-semibold text-sm flex items-center justify-center gap-2">
+                                <span data-i18n="btnLearnMore">了解更多管理職責</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Domain 4 -->
+                    <div class="glass-panel rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 transition-all duration-300 group flex flex-col">
+                        <div class="relative h-60 bg-gradient-to-tr from-emerald-900 to-indigo-900 overflow-hidden flex items-center justify-center">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-500/20 via-transparent to-transparent opacity-60"></div>
+                            <div class="text-center p-6 relative z-10 group-hover:scale-105 transition-transform duration-500">
+                                <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md mx-auto flex items-center justify-center text-white text-3xl font-bold mb-3 shadow-lg border border-white/20">
+                                    <i class="fa-solid fa-shield-cat"></i>
+                                </div>
+                                <h4 class="text-white text-xl font-bold tracking-tight" data-i18n="p4Title">保安審計與高價資產護衛</h4>
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">Avseco Operations</span>
+                                <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-semibold">Risk Assessment</span>
+                                <span class="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs font-semibold">Valuable Cargo Escort</span>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 flex-grow leading-relaxed" data-i18n="p4Desc">
+                                早期於 Avseco 執行裝甲車與貴重貨物護衛、保安審計、風險評估及航空特種安保任務。
+                            </p>
+                            <button onclick="openProjectModal(currentLang === 'en' ? 'Security Audits & High-Value Asset Escort Operations' : '保安審計與高價資產護衛營運', currentLang === 'en' ? 'Accumulated 6 years of solid security experience at Avseco. Conducted armored vehicle and valuable cargo escorts, security audits, risk assessments, and provided special aviation security escort services for airlines.' : '於 Avseco 累積 6 年紮實安保經驗。執行裝甲車及貴重貨物護衛與運送、進行保安審計與風險評估、組織專業研討會，並提供航空公司加強保安及特別旅客機艙護衛服務。', ['Security Supervision', 'Risk Assessment', 'Cargo Escort', 'Security Audit'])" class="w-full py-3 rounded-xl bg-slate-200/70 dark:bg-slate-800/80 hover:bg-indigo-600 hover:text-white transition-all font-semibold text-sm flex items-center justify-center gap-2">
+                                <span data-i18n="btnLearnMore">了解更多管理職責</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-            <p style="opacity: 0.9; margin-top: 2rem;">Available for full-time opportunities and professional consulting. Negotiable start date.</p>
-        </div>
-    </section>
+        </section>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2026 Berlin Cheung. All rights reserved. | Professional Property Management & Facilities Specialist</p>
+        <!-- 4. CONTACT PAGE -->
+        <section id="page-contact" class="page-section hidden animate-fade-in py-16 md:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 font-bold mb-3 block">Get in Touch</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-4" data-i18n="contactHeaderTitle">聯絡我與諮詢預約</h2>
+                    <p class="text-slate-600 dark:text-slate-400" data-i18n="contactHeaderSubtitle">目前開放全職物業與設施管理職位機會或專業諮詢，歡迎隨時與我聯繫。</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    
+                    <!-- Contact Info & Socials -->
+                    <div class="lg:col-span-5 flex flex-col justify-between gap-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4" data-i18n="contactSubHeading">期待為您的機構貢獻專業管理長長效能</h3>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-8" data-i18n="contactSubDesc">
+                                我擁有 15+ 年扎實經驗與多項專業資歷。如果您正在尋找具備高度責任感、危機處理能力與豐富實戰經驗的物業資產與設施管理人才，請隨時透過表單或直撥電話聯絡我。
+                            </p>
+
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-4 glass-panel p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg font-bold">
+                                        <i class="fa-solid fa-phone"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400 block font-medium" data-i18n="lblPhone">電話號碼</span>
+                                        <span class="text-sm font-bold">+852 5366 1888</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 glass-panel p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg font-bold">
+                                        <i class="fa-solid fa-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400 block font-medium" data-i18n="lblEmail">電子郵件</span>
+                                        <span class="text-sm font-bold">cheung0502@yahoo.com</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 glass-panel p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                                    <div class="w-12 h-12 rounded-xl bg-pink-500/10 text-pink-600 dark:text-pink-400 flex items-center justify-center text-lg font-bold">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs text-slate-500 dark:text-slate-400 block font-medium" data-i18n="lblLocation">常駐地點</span>
+                                        <span class="text-sm font-bold" data-i18n="locationVal">香港 (到職日期可商議)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Icons -->
+                        <div>
+                            <span class="text-xs uppercase tracking-widest text-slate-500 font-bold mb-4 block">Direct Channels</span>
+                            <div class="flex items-center gap-3">
+                                <a href="tel:+85253661888" class="w-12 h-12 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all" title="Call">
+                                    <i class="fa-solid fa-phone text-lg"></i>
+                                </a>
+                                <a href="mailto:cheung0502@yahoo.com" class="w-12 h-12 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all" title="Email">
+                                    <i class="fa-solid fa-envelope text-lg"></i>
+                                </a>
+                                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all" title="LinkedIn">
+                                    <i class="fa-brands fa-linkedin-in text-lg"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="lg:col-span-7">
+                        <div class="glass-panel p-8 sm:p-10 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl relative">
+                            <form id="contact-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                                <div>
+                                    <label for="name" class="block text-sm font-semibold mb-2" data-i18n="formName">您的姓名 / 機構名稱</label>
+                                    <input type="text" id="name" required placeholder="例如：陳大文 / ABC 物業管理公司" class="w-full px-4 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-semibold mb-2" data-i18n="formEmail">電子郵件</label>
+                                    <input type="email" id="email" required placeholder="name@example.com" class="w-full px-4 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm">
+                                </div>
+                                <div>
+                                    <label for="message" class="block text-sm font-semibold mb-2" data-i18n="formMsg">您的訊息或職位邀約</label>
+                                    <textarea id="message" rows="5" required placeholder="請在此輸入您想洽談的物業管理職位、諮詢細節或合作邀約..." class="w-full px-4 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm resize-none"></textarea>
+                                </div>
+                                <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-paper-plane text-sm"></i>
+                                    <span data-i18n="formSubmit">發送訊息</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-200 dark:border-slate-800/80 glass-panel py-8 mt-12 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium" data-i18n="footerAvail">Available for full-time opportunities & professional consulting</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+                &copy; 2026 Berlin Cheung. Dedicated to Excellence in Property Asset & Facilities Management.
+            </p>
+        </div>
     </footer>
 
+    <!-- Project Modal -->
+    <div id="project-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-2xl relative">
+            <button onclick="closeProjectModal()" aria-label="關閉" class="absolute top-6 right-6 w-10 h-10 rounded-xl bg-slate-200/70 dark:bg-slate-900 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-800 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="modal-title" class="text-2xl font-bold mb-4 pr-12"></h3>
+            <div id="modal-tags" class="flex flex-wrap gap-2 mb-6"></div>
+            <p id="modal-desc" class="text-slate-600 dark:text-slate-400 leading-relaxed text-sm sm:text-base mb-8"></p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeProjectModal()" class="px-6 py-3 rounded-xl bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors font-semibold text-sm" data-i18n="modalClose">關閉</button>
+                <a href="#contact" onclick="closeProjectModal(); switchPage('contact');" class="px-6 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-colors font-semibold text-sm flex items-center gap-2">
+                    <span data-i18n="modalInquire">詢問此專業領域相關合作</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 glass-panel border border-emerald-500/50 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-check text-sm"></i>
+        </div>
+        <div>
+            <h5 id="toast-title" class="font-bold text-sm">訊息已送出</h5>
+            <p id="toast-message" class="text-xs text-slate-500 dark:text-slate-400">感謝您的聯絡，Berlin Cheung 將盡快回覆您！</p>
+        </div>
+    </div>
+
     <script>
-        // Smooth scroll behavior is handled by CSS
-        // Mobile menu functionality
-        const mobileToggle = document.querySelector('.mobile-menu-toggle');
-        const navMenu = document.querySelector('nav ul');
+        // Dictionary for Bilingual Support (Traditional Chinese & English)
+        let currentLang = localStorage.getItem('lang') || 'zh';
 
-        mobileToggle.addEventListener('click', () => {
-            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
-        });
+        const i18n = {
+            zh: {
+                logoSubtitle: "Property & Facilities Expert",
+                navHome: "首頁",
+                navAbout: "關於我與經歷",
+                navPortfolio: "專業範疇",
+                navContact: "聯絡我",
+                heroBadge: "專業物業資產與設施管理諮詢",
+                heroTitlePre: "致力於卓越的",
+                heroTitleHighlight: "物業資產與設施管理",
+                heroSubtitlePre: "擁有 15+ 年香港各大知名機構之",
+                btnPortfolio: "查看專業範疇",
+                btnContact: "與我取得聯繫",
+                coreExpertiseTitle: "核心專業與服務承諾",
+                card1Title: "物業資產與租戶服務",
+                card1Desc: "專精處理業主及租戶查詢與投訴、物業文件起草與維護、交吉手續交接，並提供卓越的租戶關係維護與滿意度提升。",
+                card2Title: "設施管理與承辦商監督",
+                card2Desc: "統籌日常設施維護保養、水電消耗審查與節能方案、服務承辦商績效監督、預算編製及合規安全管理。",
+                card3Title: "緊急事故應變與領導統御",
+                card3Desc: "具備高度應變能力與獨立危機處理經驗，能冷靜應對突發緊急事件、跨部門協調及利益相關者溝通。",
+                aboutHeaderTitle: "個人背景與職涯發展歷程",
+                aboutHeaderSubtitle: "擁有超過 15 年香港各大型機構資歷，以嚴謹、責任感與高效協調能力聞名於業界。",
+                bioHeadingPre: "追求卓越的資產與設施管理專業人士",
+                bioPara1: "在物業管理與設施營運領域擁有超過 7 年的深厚經驗，並具備總計 15 年以上的多元管理與保安督導資歷。擅長處理業主與租戶投訴、財務協調、物業文件草擬、緊急事故處理及承辦商績效監督。",
+                bioPara2: "具備極強的自我主動性、領導力與獨立應變能力，能為企業及住戶打造安全、高效且和諧的環境。",
+                stat1: "年業界累積資歷",
+                stat2: "年物業管理實戰",
+                stat3: "專業資歷架構認證",
+                skillsHeader: "核心專業技能與資歷",
+                skill1: "物業資產管理 (Property Asset Management)",
+                skill2: "設施管理與維護 (Facilities Management)",
+                skill3: "租戶關係維護 (Tenant Relations)",
+                skill4: "緊急事故應變 (Emergency Response)",
+                skill5: "承辦商統籌與監督 (Contractor Liaison)",
+                skill6: "預算編製與營運報告 (Budgeting & Reporting)",
+                skillLang: "中文 (流利) / 英文 (一般) / 普通話",
+                certHeader: "專業證照與資格",
+                cert1: "安全督導員證書 (Safety Supervisor)",
+                cert2: "QAS 保安培訓認證",
+                cert3: "建造業平安卡 (綠卡)",
+                cert4: "香港駕駛執照 (私家車及輕型貨車)",
+                timelineHeader: "職涯發展與學歷歷程",
+                portHeaderTitle: "核心物業與設施管理範疇",
+                portHeaderSubtitle: "展示各項重大專案經驗與管理範疇，點擊「了解更多」查看詳細執行職責。",
+                p1Title: "商住宅物業資產統籌",
+                p1Desc: "涵蓋住宅與商業物業之日常資產管理、住戶/租戶投訴處理、物業文件檔案與交吉交接流程監督。",
+                p2Title: "大型設施維護與節能方案",
+                p2Desc: "於運輸署車輛檢驗綜合大樓及新世界設施管理公司擔任要職，主導設施維護、水電消耗審查、節能方案及合約監督。",
+                p3Title: "租戶關係與緊急應變",
+                p3Desc: "專注於租戶日常查詢及緊急事件處理、承辦商進度監控、屋苑清潔與保安服務統籌。",
+                p4Title: "保安審計與高價資產護衛",
+                p4Desc: "早期於 Avseco 執行裝甲車與貴重貨物護衛、保安審計、風險評估及航空特種安保任務。",
+                btnLearnMore: "了解更多管理職責",
+                contactHeaderTitle: "聯絡我與諮詢預約",
+                contactHeaderSubtitle: "目前開放全職物業與設施管理職位機會或專業諮詢，歡迎隨時與我聯繫。",
+                contactSubHeading: "期待為您的機構貢獻專業管理長長效能",
+                contactSubDesc: "我擁有 15+ 年扎實經驗與多項專業資歷。如果您正在尋找具備高度責任感、危機處理能力與豐富實戰經驗的物業資產與設施管理人才，請隨時透過表單或直撥電話聯絡我。",
+                lblPhone: "電話號碼",
+                lblEmail: "電子郵件",
+                lblLocation: "常駐地點",
+                locationVal: "香港 (到職日期可商議)",
+                formName: "您的姓名 / 機構名稱",
+                formEmail: "電子郵件",
+                formMsg: "您的訊息或職位邀約",
+                formSubmit: "發送訊息",
+                footerAvail: "Available for full-time opportunities & professional consulting",
+                modalClose: "關閉",
+                modalInquire: "詢問此專業領域相關合作"
+            },
+            en: {
+                logoSubtitle: "Property & Facilities Expert",
+                navHome: "Home",
+                navAbout: "About & Experience",
+                navPortfolio: "Portfolio",
+                navContact: "Contact",
+                heroBadge: "Professional Property Asset & Facilities Management Consulting",
+                heroTitlePre: "Dedicated to Excellence in",
+                heroTitleHighlight: "Property Asset & Facilities Management",
+                heroSubtitlePre: "15+ years of progressive experience across leading Hong Kong organizations:",
+                btnPortfolio: "View Professional Domains",
+                btnContact: "Get in Touch",
+                coreExpertiseTitle: "Core Expertise & Commitments",
+                card1Title: "Property Asset & Tenant Services",
+                card1Desc: "Specialized in managing owner/tenant inquiries & complaints, drafting & maintaining documentation, tenant handovers, and cultivating exceptional satisfaction.",
+                card2Title: "Facilities & Contractor Supervision",
+                card2Desc: "Coordinating daily maintenance, reviewing electricity & water consumption, implementing energy-saving schemes, and supervising contractor performance.",
+                card3Title: "Emergency Response & Leadership",
+                card3Desc: "Equipped with strong crisis management skills, calm under pressure during emergency incidents, cross-department coordination, and stakeholder communication.",
+                aboutHeaderTitle: "Personal Background & Career Journey",
+                aboutHeaderSubtitle: "Over 15 years of progressive experience across leading Hong Kong organizations, renowned for rigor and efficiency.",
+                bioHeadingPre: "Dedicated Property Asset & Facilities Professional",
+                bioPara1: "Spanning more than 7 years in property management, featuring hands-on experience in addressing owner/tenant complaints, handling financial matters, drafting property documentation, managing emergency cases, and supervising contractors.",
+                bioPara2: "Possesses strong self-initiative, leadership, and independent crisis management abilities to build safe, efficient, and harmonious environments.",
+                stat1: "Years Experience",
+                stat2: "Years Property Ops",
+                stat3: "QF L5 Framework",
+                skillsHeader: "Core Professional Skills & Credentials",
+                skill1: "Property Asset Management",
+                skill2: "Facilities Management",
+                skill3: "Tenant Relations",
+                skill4: "Emergency Response",
+                skill5: "Contractor Liaison",
+                skill6: "Budgeting & Reporting",
+                skillLang: "Chinese (Proficient), English (Fair), Putonghua",
+                certHeader: "Professional Certifications",
+                cert1: "Safety Supervisor Certificate",
+                cert2: "QAS Security Guard Training",
+                cert3: "Construction Site Safety Card (Green Card)",
+                cert4: "HK Driving License (Car & Light Goods)",
+                timelineHeader: "Career Development & Education Timeline",
+                portHeaderTitle: "Core Property & Facilities Domains",
+                portHeaderSubtitle: "Showcasing major project experience and management domains. Click 'Learn More' for detailed responsibilities.",
+                p1Title: "Residential & Commercial Property Asset Ops",
+                p1Desc: "Coordinating daily asset management, tenant complaints resolution, documentation, and handover procedures in residential and commercial buildings.",
+                p2Title: "Facilities Maintenance & Energy Schemes",
+                p2Desc: "Served at Transport Dept Vehicle Examination Complex and New World FM, supervising maintenance, utilities review, and energy-saving measures.",
+                p3Title: "Tenant Services & Emergency Response",
+                p3Desc: "Focused on tenant requests, emergency incidents handling, contractor progress monitoring, and security/cleaning operations oversight.",
+                p4Title: "Security Audits & Valuable Asset Escort",
+                p4Desc: "Early career at Avseco conducting armored vehicle & valuable cargo escorts, security audits, risk assessments, and aviation security services.",
+                btnLearnMore: "Learn More Details",
+                contactHeaderTitle: "Get in Touch & Consultations",
+                contactHeaderSubtitle: "Currently open for full-time property & facilities management roles or consulting. Feel free to contact me.",
+                contactSubHeading: "Ready to Contribute Professional Excellence to Your Organization",
+                contactSubDesc: "With 15+ years of solid experience and multi-disciplinary credentials, I am ready to bring high responsibility and crisis resilience to your team.",
+                lblPhone: "Phone Number",
+                lblEmail: "Email Address",
+                lblLocation: "Location",
+                locationVal: "Hong Kong (Negotiable start date)",
+                formName: "Your Name / Organization",
+                formEmail: "Email Address",
+                formMsg: "Your Message or Job Offer",
+                formSubmit: "Send Message",
+                footerAvail: "Available for full-time opportunities & professional consulting",
+                modalClose: "Close",
+                modalInquire: "Inquire About This Domain"
+            }
+        };
 
-        // Close menu when link is clicked
-        document.querySelectorAll('nav a').forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.style.display = 'none';
+        const typingWords = {
+            zh: ["資深物業資產管理專員", "設施管理與營運專家", "租戶關係與危機處理", "15+年業界豐富經驗"],
+            en: ["Property Asset Officer", "Facilities Management Expert", "Tenant Relations & Crisis Handling", "15+ Years Industry Experience"]
+        };
+
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typingElement = document.getElementById("typing-text");
+
+        function typeEffect() {
+            if (!typingElement) return;
+            const words = typingWords[currentLang] || typingWords['zh'];
+            const currentWord = words[wordIndex % words.length];
+            
+            if (isDeleting) {
+                typingElement.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typingElement.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 50 : 100;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                typeSpeed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                typeSpeed = 500;
+            }
+
+            setTimeout(typeEffect, typeSpeed);
+        }
+
+        // Apply Translations
+        function applyLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            document.getElementById('lang-label').textContent = lang === 'en' ? '繁中' : 'EN';
+            
+            // Translate standard data-i18n elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key]) {
+                    el.textContent = i18n[lang][key];
+                }
             });
+
+            // Translate list elements if needed
+            // (Timeline content remains readable in original professional terms or can be switched)
+        }
+
+        function toggleLanguage() {
+            applyLanguage(currentLang === 'zh' ? 'en' : 'zh');
+        }
+
+        // Initialize typing effect on load
+        window.addEventListener('DOMContentLoaded', () => {
+            applyLanguage(currentLang);
+            typeEffect();
         });
+
+        // Single-Page Routing Function
+        function switchPage(pageId) {
+            const sections = document.querySelectorAll('.page-section');
+            sections.forEach(sec => sec.classList.add('hidden'));
+
+            const targetSection = document.getElementById(`page-${pageId}`);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Update active state on nav buttons
+            const navButtons = document.querySelectorAll('nav button');
+            navButtons.forEach(btn => {
+                btn.classList.remove('text-indigo-600', 'dark:text-white', 'font-semibold');
+                btn.classList.add('text-slate-700', 'dark:text-slate-300', 'font-medium');
+            });
+            
+            const activeBtn = document.getElementById(`nav-${pageId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-700', 'dark:text-slate-300', 'font-medium');
+                activeBtn.classList.add('text-indigo-600', 'dark:text-white', 'font-semibold');
+            }
+        }
+
+        // Dark / Light Mode Toggle (Default is now Light mode)
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                themeIcon.className = "fa-solid fa-moon text-sm";
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                themeIcon.className = "fa-solid fa-sun text-sm";
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Check local storage theme on load (Default is Light)
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-icon').className = "fa-solid fa-sun text-sm";
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.getElementById('theme-icon').className = "fa-solid fa-moon text-sm";
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            menu.classList.toggle('hidden');
+            if (menu.classList.contains('hidden')) {
+                icon.className = "fa-solid fa-bars text-sm";
+            } else {
+                icon.className = "fa-solid fa-xmark text-sm";
+            }
+        }
+
+        // Project Modal Functions
+        function openProjectModal(title, desc, tags) {
+            const modal = document.getElementById('project-modal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-desc').textContent = desc;
+            
+            const tagsContainer = document.getElementById('modal-tags');
+            tagsContainer.innerHTML = '';
+            tags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = "px-3 py-1 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-semibold";
+                span.textContent = tag;
+                tagsContainer.appendChild(span);
+            });
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeProjectModal() {
+            const modal = document.getElementById('project-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Form Submit Handler
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+
+            if (!name || !email || !message) return;
+
+            // Show custom toast
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').textContent = currentLang === 'en' ? `Thank you, ${name}!` : `感謝您的聯絡，${name}！`;
+            document.getElementById('toast-message').textContent = currentLang === 'en' ? `Your message has been sent successfully. Berlin Cheung will reply soon.` : `您的訊息已成功送出，Berlin Cheung 將盡快回覆至 ${email}。`;
+            
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            // Reset form
+            document.getElementById('contact-form').reset();
+
+            // Hide toast after 4 seconds
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 4000);
+        }
     </script>
 </body>
 </html>

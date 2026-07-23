@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summary</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; background: #f9f9f7; color: #1a1a18; padding: 1.5rem; }
+h1 { font-size: 20px; font-weight: 500; margin-bottom: 0.25rem; }
+.sub { font-size: 13px; color: #666; margin-bottom: 1.25rem; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+.stat { background: #fff; border: 0.5px solid #d8d6ce; border-radius: 8px; padding: 0.75rem 1rem; }
+.stat-label { font-size: 11px; color: #888; margin-bottom: 3px; }
+.stat-val { font-size: 18px; font-weight: 500; }
+.controls { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+input[type=text], select { padding: 10px 14px; border: 0.5px solid #ccc; border-radius: 8px; font-size: 13px; outline: none; transition: border-color 0.2s; background: #fff; }
+input[type=text] { flex: 2; min-width: 200px; }
+select { flex: 1; min-width: 120px; cursor: pointer; }
+input[type=text]:focus, select:focus { border-color: #1a1a18; }
+.btn-export {
+padding: 0 20px;
+background: #1a1a18;
+color: white;
+border: none;
+border-radius: 8px;
+font-size: 13px;
+cursor: pointer;
+font-weight: 500;
+transition: opacity 0.2s;
+display: flex;
+align-items: center;
+gap: 6px;
+height: 38px;
+}
+.btn-export:hover { opacity: 0.8; }
+.wrap { overflow-x: auto; background: #fff; border: 0.5px solid #d8d6ce; border-radius: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { border-bottom: 1.5px solid #eee; background: #fafafa; }
+th { padding: 12px 10px; text-align: left; font-weight: 500; color: #555; white-space: nowrap; cursor: pointer; user-select: none; }
+th:hover { background: #f0f0ed; }
+th.r { text-align: right; }
+th::after { content: ' ↕'; font-size: 10px; color: #ccc; }
+th.sort-asc::after { content: ' ↑'; color: #1a1a18; }
+th.sort-desc::after { content: ' ↓'; color: #1a1a18; }
+td { padding: 10px 10px; vertical-align: middle; border-bottom: 0.5px solid #eee; line-height: 1.4; }
+td.num { text-align: right; color: #aaa; font-size: 11px; width: 40px; }
+td.muted { color: #666; }
+tr:nth-child(even) { background: #fcfcf9; }
+tr:hover { background: #f0f4f8; }
+a { color: #0066cc; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.uni-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: #f0f0ed; color: #555; }
+.note-foot { font-size: 11px; color: #aaa; margin-top: 1rem; line-height: 1.4; }
+.pagination {
+display: flex;
+align-items: center;
+gap: 8px;
+margin-top: 1rem;
+flex-wrap: wrap;
+justify-content: space-between;
+}
+.pg-info { font-size: 13px; color: #555; }
+.pg-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pg-btn {
+padding: 6px 12px;
+background: #fff;
+border: 0.5px solid #d8d6ce;
+border-radius: 6px;
+font-size: 13px;
+cursor: pointer;
+color: #1a1a18;
+transition: all 0.15s;
+min-width: 36px;
+}
+.pg-btn:hover:not(:disabled) { background: #f0f0ed; border-color: #1a1a18; }
+.pg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+.pg-jump {
+display: flex;
+align-items: center;
+gap: 6px;
+font-size: 13px;
+color: #555;
+}
+.pg-jump input {
+width: 60px;
+padding: 6px 10px;
+border: 0.5px solid #ccc;
+border-radius: 6px;
+font-size: 13px;
+text-align: center;
+outline: none;
+}
+.pg-jump input:focus { border-color: #1a1a18; }
+.pg-jump button {
+padding: 6px 12px;
+background: #1a1a18;
+color: #fff;
+border: none;
+border-radius: 6px;
+font-size: 12px;
+cursor: pointer;
+}
+.pg-jump button:hover { opacity: 0.85; }
+</style>
+</head>
+<body>
+<h1>Summary</h1>
+<p class="sub">Hong Kong Taught Postgraduate Programmes Directory</p>
+<div class="stats">
+<div class="stat"><div class="stat-label">Programmes</div><div class="stat-val" id="c-count">—</div></div>
+<div class="stat"><div class="stat-label">Universities</div><div class="stat-val" id="c-uni">—</div></div>
+<div class="stat"><div class="stat-label">Departments</div><div class="stat-val" id="c-dept">—</div></div>
+</div>
+<div class="controls">
+<input type="text" id="q" placeholder="Search programmes, departments, or keywords..." oninput="resetAndRender()">
+<select id="uniFilter" onchange="resetAndRender()">
+<option value="">All Universities</option>
+</select>
+<select id="subjFilter" onchange="resetAndRender()">
+<option value="">All Subject Categories</option>
+</select>
+<select id="awardFilter" onchange="resetAndRender()">
+<option value="">All Awards</option>
+</select>
+<button class="btn-export" onclick="exportToExcel()">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+Export
+</button>
+</div>
+<div class="wrap">
+<table>
+<thead>
+<tr>
+<th class="r" onclick="setSort(-1)">No.</th>
+<th onclick="setSort(0)">University</th>
+<th onclick="setSort(3)">Programme</th>
+<th onclick="setSort(2)">Award</th>
+<th onclick="setSort(1)">Department</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+<div class="pagination">
+<div class="pg-info" id="pgInfo">—</div>
+<div class="pg-controls" id="pgControls"></div>
+<div class="pg-jump">
+<span>Go to page</span>
+<input type="number" id="pgJump" min="1" onkeydown="if(event.key==='Enter') jumpToPage()">
+<button onclick="jumpToPage()">Go</button>
+</div>
+</div>
+<p class="note-foot">
+* Click column headers to sort. Data compiled from official university programme listings.<br>
+* Click on any programme name to visit its official page.<br>
+* Directory updated based on 2025/26 and 2026/27 intake information.<br>
+<b>* Always verify programme details on the official university website before applying.</b>
+</p>
+<script>
+const D=[
+["HKU","Faculty of Architecture","MArch","Master of Architecture (Design)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-architecture-(design)-foa&mode=0"],
+["HKU","Faculty of Architecture","MArch","Master of Architecture (non-HK and International Applicants)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-architecture-(non-hk-and-international-applicants)-foa&mode=0"],
+["HKU","Faculty of Architecture","MArch","Master of Architecture (UGC funded for HK Applicants)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-architecture-(ugc-funded-for-hk-applicants)-foa&mode=0"],
+["HKU","Faculty of Architecture","MDUM","Master of Digital Urban Management","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-digital-urban-management-foa&mode=0"],
+["HKU","Faculty of Architecture","MLA","Master of Landscape Architecture","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-landscape-architecture-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(AAD)","Master of Science in Advanced Architectural Design (September 2026)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-advanced-architectural-design-(sep-2026)-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(Conservation)CPM","Master of Science in Conservation (Conservation Planning and Management Stream)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-conservation-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(Con)Design","Master of Science in Conservation (Design for Conservation Stream)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-conservation-(design-for-conservation-stream)-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(ConstProjectMan)","Master of Science in Construction Project Management","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-construction-project-management-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(DMBA)","Master of Science in Digital Management of Built Assets","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-digital-management-of-built-assets-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(RealEst)","Master of Science in Real Estate","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-real-estate-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(SED)","Master of Science in Sustainable Environmental Design","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-sustainable-environmental-design-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(UrbanAnalytics)","Master of Science in Urban Analytics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-urban-analytics-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(UDT)","Master of Science in Urban Design and Transport","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-urban-design-and-transport-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(Urban Planning)","Master of Science in Urban Planning (For ADB-Japan Scholarship Programme applicants)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-urban-planning-(for-adb-japan-scholarship-programme-applicants)-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(Urban Planning) (URP)","Master of Science in Urban Planning (Urban and Regional Planning Stream) [Self-funded for all applicants]","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-urban-planning-(urban-and-regional-planning-stream)-foa&mode=0"],
+["HKU","Faculty of Architecture","MSc(Urban Planning) (UP)","Master of Science in Urban Planning (Urban Planning Stream) [UGC-funded for HK Applicants]","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-urban-planning-(for-general-applicants)-foa&mode=0"],
+["HKU","Faculty of Architecture","MUrbanDesign","Master of Urban Design (For ADB-Japan Scholarship Programme applicants)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-urban-design-(for-adb-japan-scholarship-programme-applicants)-foa&mode=0"],
+["HKU","Faculty of Architecture","MUrbanDesign","Master of Urban Design (For general applicants)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-urban-design-(for-general-applicants)-foa&mode=0"],
+["HKU","Faculty of Architecture","MUS&HM (Professional Stream)","Master of Urban Studies and Housing Management (Housing Management (Professional) Stream)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-urban-studies-and-housing-management-(housing-management-(professional)-stream)-foa&mode=0"],
+["HKU","Faculty of Architecture","MUS&HM (Urban Studies Stream)","Master of Urban Studies and Housing Management (Urban Studies Stream)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-urban-studies-and-housing-management-foa-(urban-studies-stream)&mode=0"],
+["HKU","Faculty of Architecture","PDLA","Postgraduate Diploma in Landscape Architecture","https://portal.hku.hk/tpg-admissions/programme-details?programme=postgraduate-diploma-in-landscape-architecture-foa&mode=0"],
+["HKU","Faculty of Arts","MA(AppliedLinguistics)","Master of Arts in Applied Linguistics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-applied-linguistics-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of AI, Ethics and Society","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-ai,-ethics-and-society-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Art History","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-art-history-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Chinese Historical Studies","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-chinese-historical-studies-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Chinese Language and Literature","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-chinese-language-and-literature-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Creative Communications","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-creative-communications-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of East Asian Studies","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-east-asian-studies-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of English Studies","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-english-studies-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of European Studies","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-european-studies-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Hong Kong Cultural Studies","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-hong-kong-cultural-studies-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Hong Kong History","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-hong-kong-history-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Linguistics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-linguistics-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Literary and Cultural Studies","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-literary-and-cultural-studies-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Museum Studies","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-museum-studies-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Music Studies","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-music-studies-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Philosophy, Politics and Economics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-philosophy,-politics-and-economics-arts&mode=0"],
+["HKU","Faculty of Arts","MA","Master of Arts in the field of Translation","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-the-field-of-translation-arts&mode=0"],
+["HKU","Faculty of Arts","MBC","Master of Buddhist Counselling","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-buddhist-counselling-arts&mode=0"],
+["HKU","Faculty of Arts","MBuddhStud","Master of Buddhist Studies","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-buddhist-studies-arts&mode=0"],
+["HKU","Faculty of Arts","MFA","Master of Fine Arts in the field of Creative Writing in English","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-fine-arts-in-the-field-of-creative-writing-in-english-arts&mode=0"],
+["HKU","Faculty of Dentistry","AdvDipOrth","Advanced Diploma in Orthodontics","https://portal.hku.hk/tpg-admissions/programme-details?programme=advanced-diploma-in-orthodontics-facdent&mode=0"],
+["HKU","Faculty of Dentistry","MDS(Endo)","Master of Dental Surgery in Endodontics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-dental-surgery-in-endodontics-facdent&mode=0"],
+["HKU","Faculty of Dentistry","MDS(OralMaxFacSur)","Master of Dental Surgery in Oral and Maxillofacial Surgery","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-dental-surgery-in-oral-and-maxillofacial-surgery-facdent&mode=0"],
+["HKU","Faculty of Dentistry","MDS(Orthodontics&DentofacialOrthopaedics)","Master of Dental Surgery in Orthodontics and Dentofacial Orthopaedics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-dental-surgery-in-orthodontics-and-dentofacial-orthopaedics-facdent&mode=0"],
+["HKU","Faculty of Dentistry","MDS(PaediatrDent)","Master of Dental Surgery in Paediatric Dentistry","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-dental-surgery-in-paediatric-dentistry-facdent&mode=0"],
+["HKU","Faculty of Dentistry","MDS(Perio)","Master of Dental Surgery in Periodontology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-dental-surgery-in-periodontology-facdent&mode=0"],
+["HKU","Faculty of Dentistry","MDS(Prostho)","Master of Dental Surgery in Prosthodontics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-dental-surgery-in-prosthodontics-facdent&mode=0"],
+["HKU","Faculty of Dentistry","MSc(CommunityDent)","Master of Science in Community Dentistry","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-community-dentistry-facdent&mode=0"],
+["HKU","Faculty of Dentistry","MSc(DMS)","Master of Science in Dental Materials Science","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-dental-materials-science-facdent&mode=0"],
+["HKU","Faculty of Dentistry","MSc(ImplantDent)","Master of Science in Implant Dentistry","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-implant-dentistry-facdent&mode=0"],
+["HKU","Faculty of Dentistry","MSc(OMFR&DI)","Master of Science in Oral and Maxillofacial Radiology & Diagnostic Imaging","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-oral-and-maxillofacial-radiology-and-diagnostic-imaging-facdent&mode=0"],
+["HKU","Faculty of Education","EdD","Doctor of Education","https://portal.hku.hk/tpg-admissions/programme-details?programme=doctor-of-education-edu&mode=0"],
+["HKU","Faculty of Education","MA(TESOL)","Master of Arts in Teaching English to Speakers of Other Languages","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-teaching-english-to-speakers-of-other-languages-edu&mode=0"],
+["HKU","Faculty of Education","MEd","Master of Education","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-education-edu&mode=0"],
+["HKU","Faculty of Education","MSc(Audiology)","Master of Science in Audiology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-audiology&mode=0"],
+["HKU","Faculty of Education","MSc(LIM)","Master of Science in Library and Information Management","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-library-and-information-management-edu&mode=0"],
+["HKU","Faculty of Education","MSc(TDLL)","Master of Science in Technology, Design and Leadership for Learning","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-technology,-design-and-leadership-for-learning-edu&mode=0"],
+["HKU","Faculty of Education","PGDE","Postgraduate Diploma in Education","https://portal.hku.hk/tpg-admissions/programme-details?programme=postgraduate-diploma-in-education-edu&mode=0"],
+["HKU","Faculty of Education","PGDE(TCSL)","Postgraduate Diploma in Education (Teaching Chinese as a Second Language)","https://portal.hku.hk/tpg-admissions/programme-details?programme=postgraduate-diploma-in-education-(teaching-chinese-as-a-second-language)-edu&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(BSE)","Master of Science in Engineering (Building Services Engineering)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(building-services-engineering)-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(CivE)","Master of Science in Engineering (Civil Engineering) - Environmental Engineering Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(civil-engineering)-environmental-engineering-stream-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(CivE)","Master of Science in Engineering (Civil Engineering) - General Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(civil-engineering)-general-stream-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(CivE)","Master of Science in Engineering (Civil Engineering) - Geotechnical Engineering Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(civil-engineering)-geotechnical-engineering-stream-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(CivE)","Master of Science in Engineering (Civil Engineering) - Structural Engineering Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(civil-engineering)-structural-engineering-stream-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(EEE)","Master of Science in Engineering (Electrical and Electronic Engineering) - Communications Engineering Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(electrical-and-electronic-engineering)-communications-engineering-stream-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(EEE)","Master of Science in Engineering (Electrical and Electronic Engineering) - General Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(electrical-and-electronic-engineering)-general-stream-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(EEE)","Master of Science in Engineering (Electrical and Electronic Engineering) - Power Engineering Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(electrical-and-electronic-engineering)-power-engineering-stream-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(EnergyE)","Master of Science in Engineering (Energy Engineering)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(energy-engineering)-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(IELM)","Master of Science in Engineering (Industrial Engineering and Logistics Management)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(industrial-engineering-and-logistics-management)-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(IEM)","Master of Science in Engineering (Infrastructure Engineering and Management) - Digital Infrastructure Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(infrastructure-engineering-and-management)-digital-infrastructure-stream-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(IEM)","Master of Science in Engineering (Infrastructure Engineering and Management) - Infrastructure Project Management Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(infrastructure-engineering-and-management)-infrastructure-project-management-stream-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(IDT)","Master of Science in Engineering (Innovative Design and Technology)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(innovative-design-and-technology)-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(ICES)","Master of Science in Engineering (Integrated Circuits and Electronic Systems)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(integrated-circuits-and-electronic-systems)-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(LAT)","Master of Science in Engineering (Low-Altitude Technology)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(low-altitude-technology)-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(ME)","Master of Science in Engineering (Mechanical Engineering)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(mechanical-engineering)-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(MEST)","Master of Science in Engineering (Microelectronics Science and Technology)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(microelectronics-science-and-technology)-engg&mode=0"],
+["HKU","Faculty of Engineering","MSc(Eng)(RIS)","Master of Science in Engineering (Robotics and Intelligent Systems)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-engineering-(robotics-and-intelligent-systems)-engg&mode=0"],
+["HKU","Faculty of Law","*Subject to University's Approval","Executive Master in Business Laws* (EMBL)","https://portal.hku.hk/tpg-admissions/programme-details?programme=executive-master-in-business-laws-law&mode=0"],
+["HKU","Faculty of Law","JD","Juris Doctor","https://portal.hku.hk/tpg-admissions/programme-details?programme=juris-doctor-law&mode=0"],
+["HKU","Faculty of Law","MCL","Master of Common Law","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-common-law-law&mode=0"],
+["HKU","Faculty of Law","LLM","Master of Laws (General or with Specialisation)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-laws-(general-or-with-specialisation)-law&mode=0"],
+["HKU","Faculty of Law","LLM(Arb&DR)","Master of Laws in Arbitration and Dispute Resolution","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-laws-in-arbitration-and-dispute-resolution-law&mode=0"],
+["HKU","Faculty of Law","LLM(ChineseLaw)","Master of Laws in Chinese Law","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-laws-in-chinese-law-law&mode=0"],
+["HKU","Faculty of Law","LLM(CR)","Master of Laws in Compliance and Regulation","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-laws-in-compliance-and-regulation-law&mode=0"],
+["HKU","Faculty of Law","LLM(CFL)","Master of Laws in Corporate and Financial Law","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-laws-in-corporate-and-financial-law-law&mode=0"],
+["HKU","Faculty of Law","LLM(HR)","Master of Laws in Human Rights","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-laws-in-human-rights-law&mode=0"],
+["HKU","Faculty of Law","LLM(T&IPL)","Master of Laws in Technology and Intellectual Property Law","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-laws-in-technology-and-intellectual-property-law-law&mode=0"],
+["HKU","Faculty of Law","PCLL","Postgraduate Certificate in Laws","https://portal.hku.hk/tpg-admissions/programme-details?programme=postgraduate-certificate-in-laws-law&mode=0"],
+["HKU","Faculty of Science","MSc(AI)","Master of Science in Artificial Intelligence","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-artificial-intelligence-sci&mode=0"],
+["HKU","Faculty of Science","MSc(EnvMan)","Master of Science in Environmental Management","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-environmental-management-sci&mode=0"],
+["HKU","Faculty of Science","MSc(IMEC)","Master of Science in Integrative Marine Ecology and Conservation","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-integrative-marine-ecology-and-conservation-sci&mode=0"],
+["HKU","Faculty of Science","MScAG","Master of Science in the field of Applied Geosciences","https://portal.hku.hk/tpg-admissions/programme-details?programme=msc-in-the-field-of-applied-geosciences-sci&mode=0"],
+["HKU","Faculty of Science","MSc(CTHM)","Master of Science in the field of Chemical Technologies for Health and Materials","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-the-field-of-chemical-technologies-for-health-and-materials-sci&mode=0"],
+["HKU","Faculty of Science","MSc (Food Industry: Management and Marketing)","Master of Science in the field of Food Industry: Management and Marketing","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-the-field-of-food-industry:-management-and-marketing-sci&mode=0"],
+["HKU","Faculty of Science","MSc (Food Safety & Toxicology)","Master of Science in the field of Food Safety and Toxicology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-the-field-of-food-safety-and-toxicology-sci&mode=0"],
+["HKU","Faculty of Science","MSc (Physics)","Master of Science in the field of Physics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-the-field-of-physics-sci&mode=0"],
+["HKU","Faculty of Social Sciences","PsyD(CP)","Doctor of Psychology in the field of Clinical Psychology","https://portal.hku.hk/tpg-admissions/programme-details?programme=doctor-of-psychology-in-the-field-of-clinical-psychology-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","PsyD(EP)","Doctor of Psychology in the field of Educational Psychology","https://portal.hku.hk/tpg-admissions/programme-details?programme=doctor-of-psychology-in-the-field-of-educational-psychology-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","DPA","Doctor of Public Administration","https://portal.hku.hk/tpg-admissions/programme-details?programme=doctor-of-public-administration-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MAAIFM","Master of Arts in Creative Artificial Intelligence Filmmaking and Media","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-creative-artificial-intelligence-filmmaking-and-media-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MChDS","Master of China Development Studies","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-arts-in-china-development-studies-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MCGRM","Master of Climate Governance and Risk Management","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-climate-governance-and-risk-management-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MExpArtsTh","Master of Expressive Arts Therapy","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-expressive-arts-therapy-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MIPA","Master of International and Public Affairs","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-international-and-public-affairs-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MJ","Master of Journalism","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-journalism-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MJ - DFS","Master of Journalism - Documentary Filmmaking Specialisation","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-journalism-documentary-filmmaking-specialisation-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MPA","Master of Public Administration","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-public-administration-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSc(GeoDS)","Master of Science in Geospatial Data Science","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-geospatial-data-science-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(APsy)","Master of Social Sciences in the field of Applied Psychology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-applied-psychology-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(BH)","Master of Social Sciences in the field of Behavioral Health","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-behavioral-health-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(CP)","Master of Social Sciences in the field of Clinical Psychology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-clinical-psychology-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(Counsel)","Master of Social Sciences in the field of Counselling","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-counselling-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(Crim)","Master of Social Sciences in the field of Criminology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-criminology-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(EP)","Master of Social Sciences in the field of Educational Psychology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-educational-psychology-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(Geron)","Master of Social Sciences in the field of Gerontology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-gerontology-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(MCCC)","Master of Social Sciences in the field of Media, Culture and Creative Cities","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-media,-culture-and-creative-cities-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(MH)","Master of Social Sciences in the field of Mental Health","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-mental-health-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(NPM)","Master of Social Sciences in the field of Nonprofit Management","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-nonprofit-management-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(Pop&PA)","Master of Social Sciences in the field of Population and Policy Analysis","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-population-and-policy-analysis-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(Psy)","Master of Social Sciences in the field of Psychology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-psychology-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(SDA)","Master of Social Sciences in the field of Social Data Analytics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-social-data-analytics-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(SSM)","Master of Social Sciences in the field of Social Service Management","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-social-service-management-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(Sociology)","Master of Social Sciences in the field of Sociology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-sciences-in-the-field-of-sociology-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MSocSc(SLG)","Master of Social Sciences in the field of Sustainability Leadership and Governance","https://portal.hku.hk/tpg-admissions/programme-details?programme=msocsc-sustainability-leadership-and-governance&mode=0"],
+["HKU","Faculty of Social Sciences","MSW","Master of Social Work","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-social-work-socsc&mode=0"],
+["HKU","Faculty of Social Sciences","MTP&P","Master of Transport Policy and Planning","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-transport-policy-and-planning-socsc&mode=0"],
+["HKU","HKU Business School","DBA","Doctor of Business Administration","https://portal.hku.hk/tpg-admissions/programme-details?programme=doctor-of-business-administration-hkubs&mode=0"],
+["HKU","HKU Business School","EMBA","Executive Master of Business Administration","https://portal.hku.hk/tpg-admissions/programme-details?programme=executive-master-of-business-administration-hkubs&mode=0"],
+["HKU","HKU Business School","MAcct","Master of Accounting","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-accounting-hkubs&mode=0"],
+["HKU","HKU Business School","MAA","Master of Accounting Analytics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-accounting-analytics-hkubs&mode=0"],
+["HKU","HKU Business School","MAIB","Master of Artificial Intelligence in Business","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-artificial-intelligence-in-business-hkubs&mode=0"],
+["HKU","HKU Business School","MBA","Master of Business Administration","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-business-administration-hkubs&mode=0"],
+["HKU","HKU Business School","IMBA","Master of Business Administration (International)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-business-administration-(international)-hkubs&mode=0"],
+["HKU","HKU Business School","MEcon","Master of Economics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-economics-hkubs&mode=0"],
+["HKU","HKU Business School","MFWM","Master of Family Wealth Management","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-family-wealth-management-hkubs&mode=0"],
+["HKU","HKU Business School","MFin","Master of Finance","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-finance-hkubs&mode=0"],
+["HKU","HKU Business School","MFFinTech","Master of Finance in Financial Technology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-finance-in-financial-technology-hkubs&mode=0"],
+["HKU","HKU Business School","MGM","Master of Global Management","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-global-management-hkubs&mode=0"],
+["HKU","HKU Business School","MSc(BA)","Master of Science in Business Analytics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-business-analytics-hkubs&mode=0"],
+["HKU","HKU Business School","MSc(Mktg)","Master of Science in Marketing","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-marketing-hkubs&mode=0"],
+["HKU","HKU Business School","MSAF","Master of Sustainable Accounting and Finance","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-sustainable-accounting-and-finance-hkubs&mode=0"],
+["HKU","HKU Business School","MWM","Master of Wealth Management","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-wealth-management-hkubs&mode=0"],
+["HKU","LKS Faculty of Medicine","DNurs","Doctor of Nursing","https://portal.hku.hk/tpg-admissions/programme-details?programme=doctor-of-nursing-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MAP","Master of Advanced Pharmacy","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-advanced-pharmacy-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MBioInno","Master of Biomedical Innovation","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-biomedical-innovation-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MChinMed","Master of Chinese Medicine","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-chinese-medicine-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MCRPD","Master of Clinical Research and Product Development","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-clinical-research-and-product-development-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MCHC","Master of Community Health Care","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-community-health-care-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MMedSc","Master of Medical Sciences","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-medical-sciences-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MMDPath","Master of Molecular and Diagnostic Pathology","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-molecular-and-diagnostic-pathology-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MNurs","Master of Nursing","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-nursing-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MPsyMed","Master of Psychological Medicine (Psychosis Studies)","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-psychological-medicine-(psychosis-studies)-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MPH","Master of Public Health","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-public-health-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MRes[Med]","Master of Research in Medicine","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-research-in-medicine-med&mode=0"],
+["HKU","LKS Faculty of Medicine","MSc(Nurs)","Master of Science in Nursing","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-nursing-med&mode=0"],
+["HKU","LKS Faculty of Medicine","PDipID","Postgraduate Diploma in Infectious Diseases","https://portal.hku.hk/tpg-admissions/programme-details?programme=postgraduate-diploma-in-infectious-diseases-med&mode=0"],
+["HKU","LKS Faculty of Medicine","PDipPsyMed","Postgraduate Diploma in Psychological Medicine (Psychosis Studies)","https://portal.hku.hk/tpg-admissions/programme-details?programme=postgraduate-diploma-in-psychological-medicine-(psychosis-studies)-med&mode=0"],
+["HKU","School of Computing and Data Science","MDASC","Master of Data Science","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-data-science-cds&mode=0"],
+["HKU","School of Computing and Data Science","MSc(CompSc)","Master of Science in Computer Science - Cyber Security Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-computer-science-cyber-security-stream-cds&mode=0"],
+["HKU","School of Computing and Data Science","MSc(CompSc)","Master of Science in Computer Science - Financial Computing Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-computer-science-financial-computing-stream-cds&mode=0"],
+["HKU","School of Computing and Data Science","MSc(CompSc)","Master of Science in Computer Science - General Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-computer-science-general-stream-cds&mode=0"],
+["HKU","School of Computing and Data Science","MSc(CompSc)","Master of Science in Computer Science - Multimedia Computing Stream","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-computer-science-multimedia-computing-stream-cds&mode=0"],
+["HKU","School of Computing and Data Science","MSc(ECom&IComp)","Master of Science in Electronic Commerce and Internet Computing","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-electronic-commerce-and-internet-computing-cds&mode=0"],
+["HKU","School of Computing and Data Science","MSc(FTDA)","Master of Science in Financial Technology and Data Analytics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-science-in-financial-technology-and-data-analytics-cds&mode=0"],
+["HKU","School of Computing and Data Science","MStat","Master of Statistics","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-statistics-cds&mode=0"],
+["HKU","School of Governance and Policy","MGP","Master of Governance and Policy","https://portal.hku.hk/tpg-admissions/programme-details?programme=master-of-governance-and-policy-sgp&mode=0"],
+["CUHK","Anthropology","MPhil","MPhil in Anthropology","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-anthropology"],
+["CUHK","Anthropology","PhD","PhD in Anthropology","https://www.gs.cuhk.edu.hk/programmes/arts/phd-anthropology"],
+["CUHK","Anthropology","MA","MA in Anthropology","https://www.gs.cuhk.edu.hk/programmes/arts/ma-anthropology"],
+["CUHK","China Studies","MPhil","MPhil in Chinese Studies","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-chinese-studies"],
+["CUHK","China Studies","PhD","PhD in Chinese Studies","https://www.gs.cuhk.edu.hk/programmes/arts/phd-chinese-studies"],
+["CUHK","China Studies","MA","MA in Chinese Studies","https://www.gs.cuhk.edu.hk/programmes/arts/ma-chinese-studies"],
+["CUHK","Chinese Language and Literature","MPhil","MPhil in Chinese Language and Literature","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-chinese-language-and-literature"],
+["CUHK","Chinese Language and Literature","PhD","PhD in Chinese Language and Literature","https://www.gs.cuhk.edu.hk/programmes/arts/phd-chinese-language-and-literature"],
+["CUHK","Chinese Language and Literature","MA","MA in Chinese Language and Literature","https://www.gs.cuhk.edu.hk/programmes/arts/ma-chinese-language-and-literature"],
+["CUHK","Cultural Studies","MPhil-PhD","MPhil-PhD in Cultural Studies","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-phd-cultural-studies"],
+["CUHK","Cultural Studies","MA","MA in Cultural Management","https://www.gs.cuhk.edu.hk/programmes/arts/ma-cultural-management"],
+["CUHK","Cultural Studies","MA","MA in Intercultural Studies","https://www.gs.cuhk.edu.hk/programmes/arts/ma-intercultural-studies"],
+["CUHK","English","MPhil","MPhil in English (Applied English Linguistics)","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-english-applied-english-linguistics"],
+["CUHK","English","MPhil","MPhil in English (Literary Studies)","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-english-literary-studies"],
+["CUHK","English","PhD","PhD in English (Applied English Linguistics)","https://www.gs.cuhk.edu.hk/programmes/arts/phd-english-applied-english-linguistics"],
+["CUHK","English","PhD","PhD in English (Literary Studies)","https://www.gs.cuhk.edu.hk/programmes/arts/phd-english-literary-studies"],
+["CUHK","English","MA","MA in English (Applied English Linguistics)","https://www.gs.cuhk.edu.hk/programmes/arts/ma-english-applied-english-linguistics"],
+["CUHK","English","MA","MA in English (Literary Studies)","https://www.gs.cuhk.edu.hk/programmes/arts/ma-english-literary-studies"],
+["CUHK","Fine Arts","Master","Master of Fine Arts","https://www.gs.cuhk.edu.hk/programmes/arts/master-fine-arts"],
+["CUHK","Fine Arts","MPhil-PhD","MPhil-PhD in Chinese Art","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-phd-chinese-art-0"],
+["CUHK","Fine Arts","MA","MA in Chinese Art History","https://www.gs.cuhk.edu.hk/programmes/arts/ma-chinese-art-history"],
+["CUHK","Fine Arts","MA","MA in Fine Arts","https://www.gs.cuhk.edu.hk/programmes/arts/ma-fine-arts"],
+["CUHK","History","MPhil","MPhil in History","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-history-0"],
+["CUHK","History","PhD","PhD in History","https://www.gs.cuhk.edu.hk/programmes/arts/phd-history-1"],
+["CUHK","History","MA","MA in Comparative and Public History","https://www.gs.cuhk.edu.hk/programmes/arts/ma-comparative-and-public-history"],
+["CUHK","Japanese Studies","MPhil-PhD","MPhil-PhD in Japanese Studies","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-phd-japanese-studies"],
+["CUHK","Japanese Studies","MA","MA in Japanese Studies","https://www.gs.cuhk.edu.hk/programmes/arts/ma-japanese-studies"],
+["CUHK","Linguistics","MPhil-PhD","MPhil-PhD in Linguistics","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-phd-linguistics"],
+["CUHK","Linguistics","MA","MA in Chinese Linguistics and Language Acquisition","https://www.gs.cuhk.edu.hk/programmes/arts/ma-chinese-linguistics-and-language-acquisition"],
+["CUHK","Linguistics","MA","MA in Linguistics","https://www.gs.cuhk.edu.hk/programmes/arts/ma-linguistics"],
+["CUHK","Music","Doctor","Doctor of Music","https://www.gs.cuhk.edu.hk/programmes/arts/doctor-music"],
+["CUHK","Music","Master","Master of Music","https://www.gs.cuhk.edu.hk/programmes/arts/master-music"],
+["CUHK","Music","MPhil","MPhil in Music","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-music"],
+["CUHK","Music","PhD","PhD in Music","https://www.gs.cuhk.edu.hk/programmes/arts/phd-music"],
+["CUHK","Music","MA","MA in Music","https://www.gs.cuhk.edu.hk/programmes/arts/ma-music-0"],
+["CUHK","Philosophy","MPhil","MPhil in Philosophy","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-philosophy"],
+["CUHK","Philosophy","PhD","PhD in Philosophy","https://www.gs.cuhk.edu.hk/programmes/arts/phd-philosophy"],
+["CUHK","Philosophy","MA","MA in Philosophy","https://www.gs.cuhk.edu.hk/programmes/arts/ma-philosophy"],
+["CUHK","Religious Studies","MPhil-PhD","MPhil-PhD in Religious Studies","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-phd-religious-studies"],
+["CUHK","Religious Studies","MA","MA in Buddhist Studies","https://www.gs.cuhk.edu.hk/programmes/arts/ma-buddhist-studies"],
+["CUHK","Religious Studies","MA","MA in Religious Studies","https://www.gs.cuhk.edu.hk/programmes/arts/ma-religious-studies"],
+["CUHK","Theology","MA","MA in Christian Studies","https://www.gs.cuhk.edu.hk/programmes/arts/ma-christian-studies"],
+["CUHK","Theology","Master","Master of Divinity","https://www.gs.cuhk.edu.hk/programmes/arts/master-divinity"],
+["CUHK","Translation","MPhil","MPhil in Translation","https://www.gs.cuhk.edu.hk/programmes/arts/mphil-translation"],
+["CUHK","Translation","PhD","PhD in Translation","https://www.gs.cuhk.edu.hk/programmes/arts/phd-translation"],
+["CUHK","Translation","MA","MA in Translation","https://www.gs.cuhk.edu.hk/programmes/arts/ma-translation"],
+["CUHK","Business Administration","MPhil-PhD","MPhil-PhD in Accountancy","https://www.gs.cuhk.edu.hk/programmes/business-administration/mphil-phd-accountancy-0"],
+["CUHK","Business Administration","MPhil-PhD","MPhil-PhD in Business Administration","https://www.gs.cuhk.edu.hk/programmes/business-administration/mphil-phd-business-administration"],
+["CUHK","Business Administration","MPhil-PhD","MPhil-PhD in Decisions, Operations and Technology","https://www.gs.cuhk.edu.hk/programmes/business-administration/mphil-phd-decisions-operations-and-technology"],
+["CUHK","Business Administration","MPhil-PhD","MPhil-PhD in Finance","https://www.gs.cuhk.edu.hk/programmes/business-administration/mphil-phd-finance"],
+["CUHK","Business Administration","MPhil-PhD","MPhil-PhD in Management","https://www.gs.cuhk.edu.hk/programmes/business-administration/mphil-phd-management-0"],
+["CUHK","Business Administration","MPhil-PhD","MPhil-PhD in Marketing","https://www.gs.cuhk.edu.hk/programmes/business-administration/mphil-phd-marketing"],
+["CUHK","Business Administration","Doctor","Doctor of Business Administration (Chinese)","https://www.gs.cuhk.edu.hk/programmes/business-administration/doctor-business-administration-chinese-1"],
+["CUHK","Business Administration","Master","Executive Master of Professional Accountancy (offered in Shanghai)","https://www.gs.cuhk.edu.hk/programmes/business-administration/executive-master-professional-accountancy-offered-shanghai-0"],
+["CUHK","Business Administration","MBA","Executive MBA","https://www.gs.cuhk.edu.hk/programmes/business-administration/executive-mba"],
+["CUHK","Business Administration","MBA","Executive MBA (Chinese)","https://www.gs.cuhk.edu.hk/programmes/business-administration/executive-mba-chinese"],
+["CUHK","Business Administration","JD/MBA","Juris Doctor/MBA","https://www.gs.cuhk.edu.hk/programmes/business-administration/juris-doctormba"],
+["CUHK","Business Administration","Master","Master of Accountancy","https://www.gs.cuhk.edu.hk/programmes/business-administration/master-accountancy"],
+["CUHK","Business Administration","MBA","MBA","https://www.gs.cuhk.edu.hk/programmes/business-administration/mba-0"],
+["CUHK","Business Administration","MBA","MBA in Finance","https://www.gs.cuhk.edu.hk/programmes/business-administration/mba-finance"],
+["CUHK","Business Administration","MSc","MSc in Actuarial Science and Insurance Analytics","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-actuarial-science-and-insurance-analytics"],
+["CUHK","Business Administration","MSc","MSc in Aviation Management","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-aviation-management"],
+["CUHK","Business Administration","MSc","MSc in Business Analytics","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-business-analytics"],
+["CUHK","Business Administration","MSc","MSc in Finance","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-finance"],
+["CUHK","Business Administration","MSc","MSc in Information and Technology Management (Part-time Mode Only)","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-information-and-technology-management-part-time-mode-only"],
+["CUHK","Business Administration","MSc","MSc in Information Science and Technology Management (Full-time Mode Only)","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-information-science-and-technology-management-full-time-1"],
+["CUHK","Business Administration","MSc","MSc in Leadership for Experience Economy","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-leadership-experience-economy"],
+["CUHK","Business Administration","MSc","MSc in Management","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-management"],
+["CUHK","Business Administration","MSc","MSc in Marketing","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-marketing"],
+["CUHK","Business Administration","MSc","MSc in Real Estate","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-real-estate"],
+["CUHK","Business Administration","MSc","MSc in Sustainable Global Business","https://www.gs.cuhk.edu.hk/programmes/business-administration/msc-sustainable-global-business"],
+["CUHK","Education","PhD","PhD in Education","https://www.gs.cuhk.edu.hk/programmes/education/phd-education"],
+["CUHK","Education","Doctor","Doctor of Education","https://www.gs.cuhk.edu.hk/programmes/education/doctor-education"],
+["CUHK","Education","MA","MA in Chinese Language Education","https://www.gs.cuhk.edu.hk/programmes/education/ma-chinese-language-education"],
+["CUHK","Education","MA","MA in Early Childhood Education","https://www.gs.cuhk.edu.hk/programmes/education/ma-early-childhood-education"],
+["CUHK","Education","MA","MA in English Language Teaching","https://www.gs.cuhk.edu.hk/programmes/education/ma-english-language-teaching"],
+["CUHK","Education","MA","MA in School Guidance and Counselling","https://www.gs.cuhk.edu.hk/programmes/education/ma-school-guidance-and-counselling"],
+["CUHK","Education","MA","MA in School Improvement and Leadership","https://www.gs.cuhk.edu.hk/programmes/education/ma-school-improvement-and-leadership"],
+["CUHK","Education","MA","MA in Teaching English to Speakers of Other Languages","https://www.gs.cuhk.edu.hk/programmes/education/ma-teaching-english-speakers-other-languages"],
+["CUHK","Education","Master","Master of Education","https://www.gs.cuhk.edu.hk/programmes/education/master-education"],
+["CUHK","Education","Master","Master of Education in Teaching in Key Subject Areas (National Excellent Teacher Training Initiative)","https://www.gs.cuhk.edu.hk/programmes/education/master-education-teaching-key-subject-areas-national-excellent-teacher"],
+["CUHK","Education","MSc","MSc in Mathematics Education","https://www.gs.cuhk.edu.hk/programmes/education/msc-mathematics-education"],
+["CUHK","Education","MSc","MSc in Sports Science and Physical Activity","https://www.gs.cuhk.edu.hk/programmes/education/msc-sports-science-and-physical-activity"],
+["CUHK","Biomedical Engineering","MPhil-PhD","MPhil-PhD in Biomedical Engineering","https://www.gs.cuhk.edu.hk/programmes/engineering/mphil-phd-biomedical-engineering"],
+["CUHK","Biomedical Engineering","MSc","MSc in Biomedical Engineering","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-biomedical-engineering"],
+["CUHK","Computer Science and Engineering","MPhil-PhD","MPhil-PhD in Computer Science and Engineering","https://www.gs.cuhk.edu.hk/programmes/engineering/mphil-phd-computer-science-and-engineering"],
+["CUHK","Computer Science and Engineering","MSc","MSc in Computer Science","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-computer-science"],
+["CUHK","Electronic Engineering","MPhil-PhD","MPhil-PhD in Electronic Engineering","https://www.gs.cuhk.edu.hk/programmes/engineering/mphil-phd-electronic-engineering"],
+["CUHK","Electronic Engineering","MSc","MSc in Electronic Engineering","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-electronic-engineering"],
+["CUHK","Electronic Engineering","MSc","MSc in Microelectronics and Integrated Circuits","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-microelectronics-and-integrated-circuits"],
+["CUHK","Engineering","MSc","MSc in Artificial Intelligence","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-artificial-intelligence"],
+["CUHK","Engineering","MSc","MSc in Financial Technology","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-financial-technology"],
+["CUHK","Information Engineering","MPhil-PhD","MPhil-PhD in Information Engineering","https://www.gs.cuhk.edu.hk/programmes/engineering/mphil-phd-information-engineering"],
+["CUHK","Information Engineering","MSc","MSc in Information Engineering","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-information-engineering"],
+["CUHK","Information Engineering","MSc","MSc in Information Science and Technology Management (Full-time Mode Only)","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-information-science-and-technology-management-full-time-mode-only"],
+["CUHK","Mechanical and Automation Engineering","MPhil-PhD","MPhil-PhD in Mechanical and Automation Engineering","https://www.gs.cuhk.edu.hk/programmes/engineering/mphil-phd-mechanical-and-automation-engineering"],
+["CUHK","Mechanical and Automation Engineering","MSc","MSc in Mechanical and Automation Engineering","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-mechanical-and-automation-engineering"],
+["CUHK","Mechanical and Automation Engineering","MSc","MSc in Robotics","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-robotics"],
+["CUHK","Systems Engineering and Engineering Management","MPhil-PhD","MPhil-PhD in Systems Engineering and Engineering Management","https://www.gs.cuhk.edu.hk/programmes/engineering/mphil-phd-systems-engineering-and-engineering-management"],
+["CUHK","Systems Engineering and Engineering Management","MSc","MSc in E-Commerce and Logistics Technologies","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-e-commerce-and-logistics-technologies"],
+["CUHK","Systems Engineering and Engineering Management","MSc","MSc in Systems Engineering and Engineering Management","https://www.gs.cuhk.edu.hk/programmes/engineering/msc-systems-engineering-and-engineering-management"],
+["CUHK","Earth System and GeoInformation Science","MPhil-PhD","MPhil-PhD in Earth System and GeoInformation Science","https://www.gs.cuhk.edu.hk/programmes/inter-faculty/mphil-phd-earth-system-and-geoinformation-science"],
+["CUHK","Gender Studies","MPhil-PhD","MPhil-PhD in Gender Studies","https://www.gs.cuhk.edu.hk/programmes/inter-faculty/mphil-phd-gender-studies"],
+["CUHK","Gender Studies","MPhil-PhD","MPhil-PhD in Gender Studies (Inter-Faculty)","https://www.gs.cuhk.edu.hk/programmes/social-science/mphil-phd-gender-studies-inter-faculty"],
+["CUHK","Gender Studies","MA","MA in Gender Studies","https://www.gs.cuhk.edu.hk/programmes/inter-faculty/ma-gender-studies"],
+["CUHK","Gender Studies","MA","MA in Gender Studies (Inter-Faculty)","https://www.gs.cuhk.edu.hk/programmes/social-science/ma-gender-studies-inter-faculty"],
+["CUHK","Law","MPhil","MPhil in Laws","https://www.gs.cuhk.edu.hk/programmes/law/mphil-laws"],
+["CUHK","Law","PhD","PhD in Laws","https://www.gs.cuhk.edu.hk/programmes/law/phd-laws"],
+["CUHK","Law","Juris Doctor","Juris Doctor","https://www.gs.cuhk.edu.hk/programmes/law/juris-doctor"],
+["CUHK","Law","JD/MBA","Juris Doctor/MBA","https://www.gs.cuhk.edu.hk/programmes/law/juris-doctormba"],
+["CUHK","Law","Master","Master of Laws in AI Law","https://www.gs.cuhk.edu.hk/programmes/law/master-laws-ai-law"],
+["CUHK","Law","Master","Master of Laws in Chinese Business Law","https://www.gs.cuhk.edu.hk/programmes/law/master-laws-chinese-business-law"],
+["CUHK","Law","Master","Master of Laws in Common Law","https://www.gs.cuhk.edu.hk/programmes/law/master-laws-common-law"],
+["CUHK","Law","Master","Master of Laws in Energy and Environmental Law","https://www.gs.cuhk.edu.hk/programmes/law/master-laws-energy-and-environmental-law"],
+["CUHK","Law","Master","Master of Laws in International Economic Law","https://www.gs.cuhk.edu.hk/programmes/law/master-laws-international-economic-law"],
+["CUHK","Law","Master","Master of Laws in Legal History","https://www.gs.cuhk.edu.hk/programmes/law/master-laws-legal-history"],
+["CUHK","Anaesthesia and Intensive Care","MPhil","MPhil in Anaesthesia and Intensive Care","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-anaesthesia-and-intensive-care"],
+["CUHK","Anaesthesia and Intensive Care","PhD","PhD in Anaesthesia and Intensive Care","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-anaesthesia-and-intensive-care"],
+["CUHK","Anatomical and Cellular Pathology","MPhil","MPhil in Anatomical and Cellular Pathology","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-anatomical-and-cellular-pathology"],
+["CUHK","Anatomical and Cellular Pathology","PhD","PhD in Anatomical and Cellular Pathology","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-anatomical-and-cellular-pathology"],
+["CUHK","Biomedical Sciences","MPhil-PhD","MPhil-PhD in Biomedical Sciences","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-phd-biomedical-sciences"],
+["CUHK","Biomedical Sciences","MSc","MSc in Genomics and Bioinformatics","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-genomics-and-bioinformatics"],
+["CUHK","Chemical Pathology","MPhil","MPhil in Chemical Pathology","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-chemical-pathology"],
+["CUHK","Chemical Pathology","PhD","PhD in Chemical Pathology","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-chemical-pathology"],
+["CUHK","Chinese Medicine","MPhil","MPhil in Chinese Medicine","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-chinese-medicine"],
+["CUHK","Chinese Medicine","PhD","PhD in Chinese Medicine","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-chinese-medicine"],
+["CUHK","Chinese Medicine","Master","Master of Chinese Medicine","https://www.gs.cuhk.edu.hk/programmes/medicine/master-chinese-medicine"],
+["CUHK","Chinese Medicine","MSc","MSc in Chinese Medicine","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-chinese-medicine"],
+["CUHK","Chinese Medicine","MSc","MSc in Chinese Medicine Pharmacology and Drug Development","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-chinese-medicine-pharmacology-and-drug-development"],
+["CUHK","Imaging and Interventional Radiology","MPhil","MPhil in Imaging and Interventional Radiology","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-imaging-and-interventional-radiology"],
+["CUHK","Imaging and Interventional Radiology","PhD","PhD in Imaging and Interventional Radiology","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-imaging-and-interventional-radiology"],
+["CUHK","Medical Sciences","MPhil","MPhil in Medical Sciences","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-medical-sciences"],
+["CUHK","Medical Sciences","PhD","PhD in Medical Sciences","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-medical-sciences"],
+["CUHK","Medical Sciences","MSc","MSc in Cardiology","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-cardiology"],
+["CUHK","Medical Sciences","MSc","MSc in Gastroenterology","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-gastroenterology"],
+["CUHK","Medical Sciences","MSc","MSc in Stroke and Clinical Neurosciences","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-stroke-and-clinical-neurosciences"],
+["CUHK","Microbiology","MPhil","MPhil in Microbiology","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-microbiology"],
+["CUHK","Microbiology","PhD","PhD in Microbiology","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-microbiology"],
+["CUHK","Nursing","MPhil-PhD","MPhil-PhD in Nursing","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-phd-nursing"],
+["CUHK","Nursing","Doctor","Doctor of Nursing","https://www.gs.cuhk.edu.hk/programmes/medicine/doctor-nursing"],
+["CUHK","Nursing","Master","Master of Nursing","https://www.gs.cuhk.edu.hk/programmes/medicine/master-nursing"],
+["CUHK","Nursing","Master","Master of Nursing Science (Pre-registration)","https://www.gs.cuhk.edu.hk/programmes/medicine/master-nursing-science-pre-registration"],
+["CUHK","Obstetrics and Gynaecology","MPhil","MPhil in Obstetrics and Gynaecology","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-obstetrics-and-gynaecology"],
+["CUHK","Obstetrics and Gynaecology","PhD","PhD in Obstetrics and Gynaecology","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-obstetrics-and-gynaecology"],
+["CUHK","Obstetrics and Gynaecology","MSc","MSc in Medical Genetics","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-medical-genetics"],
+["CUHK","Obstetrics and Gynaecology","MSc","MSc in Reproductive Medicine and Clinical Embryology","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-reproductive-medicine-and-clinical-embryology"],
+["CUHK","Ophthalmology and Visual Sciences","MPhil","MPhil in Ophthalmology and Visual Sciences","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-ophthalmology-and-visual-sciences"],
+["CUHK","Ophthalmology and Visual Sciences","PhD","PhD in Ophthalmology and Visual Sciences","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-ophthalmology-and-visual-sciences"],
+["CUHK","Orthopaedics and Traumatology","MPhil","MPhil in Orthopaedics and Traumatology","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-orthopaedics-and-traumatology"],
+["CUHK","Orthopaedics and Traumatology","PhD","PhD in Orthopaedics and Traumatology","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-orthopaedics-and-traumatology"],
+["CUHK","Orthopaedics and Traumatology","MSc","MSc in Musculoskeletal Medicine, Rehabilitation and Geriatric Orthopaedics","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-musculoskeletal-medicine-rehabilitation-and-geriatric-orthopaedics"],
+["CUHK","Orthopaedics and Traumatology","MSc","MSc in Sports Medicine and Health Science","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-sports-medicine-and-health-science"],
+["CUHK","Otorhinolaryngology and Communication Sciences","MPhil-PhD","MPhil-PhD in Otorhinolaryngology and Communication Sciences","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-phd-otorhinolaryngology-and-communication-sciences"],
+["CUHK","Otorhinolaryngology and Communication Sciences","MSc","MSc in Speech-Language Pathology","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-speech-language-pathology"],
+["CUHK","Pharmacy","MPhil","MPhil in Pharmacy","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-pharmacy"],
+["CUHK","Pharmacy","PhD","PhD in Pharmacy","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-pharmacy"],
+["CUHK","Pharmacy","Master","Master of Clinical Pharmacy","https://www.gs.cuhk.edu.hk/programmes/medicine/master-clinical-pharmacy"],
+["CUHK","Public Health","MPhil-PhD","MPhil-PhD in Public Health","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-phd-public-health"],
+["CUHK","Public Health","Master","Master of Public Health","https://www.gs.cuhk.edu.hk/programmes/medicine/master-public-health"],
+["CUHK","Public Health","MSc","MSc in Epidemiology and Biostatistics","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-epidemiology-and-biostatistics"],
+["CUHK","Public Health","MSc","MSc in Health Services Management","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-health-services-management"],
+["CUHK","Surgery","MPhil","MPhil in Surgery","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-surgery"],
+["CUHK","Surgery","MPhil-PhD","MPhil-PhD in Translational Genomics","https://www.gs.cuhk.edu.hk/programmes/medicine/mphil-phd-translational-genomics"],
+["CUHK","Surgery","PhD","PhD in Surgery","https://www.gs.cuhk.edu.hk/programmes/medicine/phd-surgery"],
+["CUHK","Surgery","MSc","MSc in Prehospital and Emergency Care","https://www.gs.cuhk.edu.hk/programmes/medicine/msc-prehospital-and-emergency-care"],
+["CUHK","Chemistry","MPhil-PhD","MPhil-PhD in Chemistry","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-chemistry"],
+["CUHK","Chemistry","MSc","MSc in Accreditation Chemistry","https://www.gs.cuhk.edu.hk/programmes/science/msc-accreditation-chemistry"],
+["CUHK","Earth and Environmental Sciences","MPhil-PhD","MPhil-PhD in Earth and Environmental Sciences","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-earth-and-environmental-sciences"],
+["CUHK","Earth and Environmental Sciences","MSc","MSc in Earth and Environmental Analytics for Sustainability","https://www.gs.cuhk.edu.hk/programmes/science/msc-earth-and-environmental-analytics-sustainability"],
+["CUHK","Life Sciences","MPhil-PhD","MPhil-PhD in Biochemistry","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-biochemistry"],
+["CUHK","Life Sciences","MPhil-PhD","MPhil-PhD in Biology","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-biology"],
+["CUHK","Life Sciences","MPhil-PhD","MPhil-PhD in Cell and Molecular Biology","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-cell-and-molecular-biology"],
+["CUHK","Life Sciences","MPhil-PhD","MPhil-PhD in Environmental Science","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-environmental-science"],
+["CUHK","Life Sciences","MPhil-PhD","MPhil-PhD in Food and Nutritional Sciences","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-food-and-nutritional-sciences"],
+["CUHK","Life Sciences","MPhil-PhD","MPhil-PhD in Molecular Biotechnology","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-molecular-biotechnology"],
+["CUHK","Life Sciences","MSc","MSc in Biochemical and Biomedical Sciences","https://www.gs.cuhk.edu.hk/programmes/science/msc-biochemical-and-biomedical-sciences"],
+["CUHK","Life Sciences","MSc","MSc in Biodiversity, Environmental Management, Sustainability and Technology","https://www.gs.cuhk.edu.hk/programmes/science/msc-biodiversity-environmental-management-sustainability-and-technology"],
+["CUHK","Life Sciences","MSc","MSc in Nutrition, Food Science and Technology","https://www.gs.cuhk.edu.hk/programmes/science/msc-nutrition-food-science-and-technology"],
+["CUHK","Materials Science and Engineering","MPhil-PhD","MPhil-PhD in Materials Science and Engineering","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-materials-science-and-engineering"],
+["CUHK","Materials Science and Engineering","MSc","MSc in Advanced Materials Science","https://www.gs.cuhk.edu.hk/programmes/science/msc-advanced-materials-science"],
+["CUHK","Mathematics","MPhil-PhD","MPhil-PhD in Mathematics","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-mathematics"],
+["CUHK","Mathematics","MSc","MSc in Mathematics","https://www.gs.cuhk.edu.hk/programmes/science/msc-mathematics"],
+["CUHK","Physics","MPhil-PhD","MPhil-PhD in Physics","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-physics"],
+["CUHK","Physics","MSc","MSc in Physics","https://www.gs.cuhk.edu.hk/programmes/science/msc-physics"],
+["CUHK","Risk Management Science","MPhil","MPhil in Risk Management Science","https://www.gs.cuhk.edu.hk/programmes/science/mphil-risk-management-science"],
+["CUHK","Risk Management Science","MSc","MSc in Risk Management Science and Data Analytics","https://www.gs.cuhk.edu.hk/programmes/science/msc-risk-management-science-and-data-analytics"],
+["CUHK","Science","MSc","MSc in Artificial Intelligence for Science","https://www.gs.cuhk.edu.hk/programmes/science/msc-artificial-intelligence-science"],
+["CUHK","Statistics","MPhil-PhD","MPhil-PhD in Statistics","https://www.gs.cuhk.edu.hk/programmes/science/mphil-phd-statistics"],
+["CUHK","Statistics","MSc","MSc in Advanced Studies in Statistics and Data Science","https://www.gs.cuhk.edu.hk/programmes/science/msc-advanced-studies-statistics-and-data-science"],
+["CUHK","Statistics","MSc","MSc in Data Science and Business Statistics","https://www.gs.cuhk.edu.hk/programmes/science/msc-data-science-and-business-statistics"],
+["CUHK","Architecture","MPhil-PhD","MPhil-PhD in Architecture","https://www.gs.cuhk.edu.hk/programmes/social-science/mphil-phd-architecture"],
+["CUHK","Architecture","Master","Master of Architecture","https://www.gs.cuhk.edu.hk/programmes/social-science/master-architecture"],
+["CUHK","Architecture","MSc","MSc in Landscape Architecture","https://www.gs.cuhk.edu.hk/programmes/social-science/msc-landscape-architecture"],
+["CUHK","Architecture","MSc","MSc in Urban Design","https://www.gs.cuhk.edu.hk/programmes/social-science/msc-urban-design"],
+["CUHK","Communication","MPhil","MPhil in Communication","https://www.gs.cuhk.edu.hk/programmes/social-science/mphil-communication"],
+["CUHK","Communication","PhD","PhD in Communication","https://www.gs.cuhk.edu.hk/programmes/social-science/phd-communication"],
+["CUHK","Communication","MA","MA in Global Communication","https://www.gs.cuhk.edu.hk/programmes/social-science/ma-global-communication"],
+["CUHK","Communication","MA","MA in Journalism","https://www.gs.cuhk.edu.hk/programmes/social-science/ma-journalism"],
+["CUHK","Communication","MSc","MSc in New Media","https://www.gs.cuhk.edu.hk/programmes/social-science/msc-new-media"],
+["CUHK","Communication","MSSc","MSSc in Advertising","https://www.gs.cuhk.edu.hk/programmes/social-science/mssc-advertising"],
+["CUHK","Communication","MSSc","MSSc in Corporate Communication","https://www.gs.cuhk.edu.hk/programmes/social-science/mssc-corporate-communication"],
+["CUHK","Economics","MPhil-PhD","MPhil-PhD in Economics","https://www.gs.cuhk.edu.hk/programmes/social-science/mphil-phd-economics"],
+["CUHK","Economics","Dual Degree - MSc","Dual Degree - MSc in Applied Economics (CUHK) and MS in Social and Economic Policy (Northwestern University)","https://www.gs.cuhk.edu.hk/programmes/social-science/dual-degree-msc-applied-economics-cuhk-and-ms-social-and-economic-policy"],
+["CUHK","Economics","MSc","MSc in Economics","https://www.gs.cuhk.edu.hk/programmes/social-science/msc-economics"],
+["CUHK","Geography and Resource Management","MPhil-PhD","MPhil-PhD in Geography and Resource Management","https://www.gs.cuhk.edu.hk/programmes/social-science/mphil-phd-geography-and-resource-management"],
+["CUHK","Geography and Resource Management","MSc","MSc in GeoInformation Science and Smart Cities","https://www.gs.cuhk.edu.hk/programmes/social-science/msc-geoinformation-science-and-smart-cities"],
+["CUHK","Geography and Resource Management","MSc","MSc in Sustainable Urban Planning","https://www.gs.cuhk.edu.hk/programmes/social-science/msc-sustainable-urban-planning"],
+["CUHK","Geography and Resource Management","MSSc","MSSc in Sustainable Tourism","https://www.gs.cuhk.edu.hk/programmes/social-science/mssc-sustainable-tourism"],
+["CUHK","Governance and Policy Science","MPhil-PhD","MPhil-PhD in Government and Public Administration","https://www.gs.cuhk.edu.hk/programmes/social-science/mphil-phd-government-and-public-administration"],
+["CUHK","Governance and Policy Science","MSSc","MSSc in Global Political Economy","https://www.gs.cuhk.edu.hk/programmes/social-science/mssc-global-political-economy"],
+["CUHK","Governance and Policy Science","MSSc","MSSc in Government and Politics (Greater China)","https://www.gs.cuhk.edu.hk/programmes/social-science/mssc-government-and-politics-greater-china"],
+["CUHK","Governance and Policy Science","MSSc","MSSc in Public Policy","https://www.gs.cuhk.edu.hk/programmes/social-science/mssc-public-policy"],
+["CUHK","Psychology","MPhil-PhD","MPhil-PhD in Industrial-Organizational Psychology","https://www.gs.cuhk.edu.hk/programmes/social-science/mphil-phd-industrial-organizational-psychology"],
+["CUHK","Psychology","MPhil-PhD","MPhil-PhD in Psychology","https://www.gs.cuhk.edu.hk/programmes/social-science/mphil-phd-psychology"],
+["CUHK","Psychology","PhD","PhD in Clinical Psychology","https://www.gs.cuhk.edu.hk/programmes/social-science/phd-clinical-psychology"],
+["CUHK","Psychology","MA","MA in Psychology","https://www.gs.cuhk.edu.hk/programmes/social-science/ma-psychology"],
+["CUHK","Psychology","MSSc","MSSc in Clinical Psychology","https://www.gs.cuhk.edu.hk/programmes/social-science/mssc-clinical-psychology"],
+["CUHK","Psychology","MSSc","MSSc in Industrial-Organizational Psychology","https://www.gs.cuhk.edu.hk/programmes/social-science/mssc-industrial-organizational-psychology"],
+["CUHK","Social Science","Doctor","Doctor of Social Science in Applied Social Science","https://www.gs.cuhk.edu.hk/programmes/social-science/doctor-social-science-applied-social-science"],
+["CUHK","Social Science","MSc","MSc in Environmental Information, Health and Public Management","https://www.gs.cuhk.edu.hk/programmes/social-science/msc-environmental-information-health-and-public-management"],
+["CUHK","Social Work","MPhil-PhD","MPhil-PhD in Social Welfare","https://www.gs.cuhk.edu.hk/programmes/social-science/mphil-phd-social-welfare"],
+["CUHK","Social Work","MA","MA in Family Counselling and Family Education","https://www.gs.cuhk.edu.hk/programmes/social-science/ma-family-counselling-and-family-education"],
+["CUHK","Social Work","MA","MA in Social Policy","https://www.gs.cuhk.edu.hk/programmes/social-science/ma-social-policy"],
+["CUHK","Social Work","MA","MA in Social Service Management","https://www.gs.cuhk.edu.hk/programmes/social-science/ma-social-service-management"],
+["CUHK","Social Work","Master","Master of Social Work","https://www.gs.cuhk.edu.hk/programmes/social-science/master-social-work"],
+["CUHK","Social Work","MSSc","MSSc in Social Work","https://www.gs.cuhk.edu.hk/programmes/social-science/mssc-social-work"],
+["CUHK","Sociology","MPhil-PhD","MPhil-PhD in Sociology","https://www.gs.cuhk.edu.hk/programmes/social-science/mphil-phd-sociology"],
+["CUHK","Sociology","MA","MA in Sociology","https://www.gs.cuhk.edu.hk/programmes/social-science/ma-sociology"],
+["HKUST","Chemistry","MSc","Analytical Chemistry","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-anchem/"],
+["HKUST","Chemistry","MPhil / PhD","Chemistry","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-chem/"],
+["HKUST","Life Science","MSc","Biotechnology","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-biot/"],
+["HKUST","Life Science","MSc","Drug Regulatory Affairs and Policy","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-drap/"],
+["HKUST","Life Science","MPhil / PhD","Life Science","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-lifs/"],
+["HKUST","Mathematics","MSc","Financial Mathematics","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-mafm/"],
+["HKUST","Mathematics","MPhil / PhD","Mathematics","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-math/"],
+["HKUST","Mathematics","MSc","Mathematics for Educators","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-maed/"],
+["HKUST","Ocean Science","MSc","Environmental Health and Safety","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-ehs/"],
+["HKUST","Ocean Science","MSc","Global Marine Resources Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-gmrm/"],
+["HKUST","Ocean Science","MPhil / PhD","Marine Environmental Science","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-mes/"],
+["HKUST","Physics","MSc","Data-Driven Modeling","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-ddm/"],
+["HKUST","Physics","MPhil / PhD","Nano Science and Technology","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-nsnt/"],
+["HKUST","Physics","MPhil / PhD","Physics","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-phys/"],
+["HKUST","Physics","MSc","Physics","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-phys/"],
+["HKUST","School of Engineering","MSc","Financial Technology 1","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-fintech/"],
+["HKUST","Chemical and Biological Engineering","MPhil / PhD","Bioengineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-bien/"],
+["HKUST","Chemical and Biological Engineering","MSc","Biomolecular Engineering and Health Informatics","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-behi/"],
+["HKUST","Chemical and Biological Engineering","MPhil / PhD","Chemical and Biomolecular Engineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-cbme/"],
+["HKUST","Chemical and Biological Engineering","MSc","Chemical and Energy Engineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-cee/"],
+["HKUST","Civil and Environmental Engineering","MPhil / PhD","Civil Engineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-civl/"],
+["HKUST","Civil and Environmental Engineering","MSc / PGD","Civil Infrastructural Engineering and Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/pgd-msc-ciem/"],
+["HKUST","Civil and Environmental Engineering","MPhil / PhD","Environmental Engineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-evng/"],
+["HKUST","Civil and Environmental Engineering","MSc / PGD","Environmental Engineering and Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/pgd-msc-evem/"],
+["HKUST","Computer Science and Engineering","MSc","AI and Entrepreneurship","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-aie/"],
+["HKUST","Computer Science and Engineering","MSc","Artificial Intelligence","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-ai/"],
+["HKUST","Computer Science and Engineering","MSc","Big Data Technology 2","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-bdt/"],
+["HKUST","Computer Science and Engineering","MPhil / PhD","Computer Science and Engineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-cse/"],
+["HKUST","Computer Science and Engineering","MSc","Information Technology","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-it/"],
+["HKUST","Electronic and Computer Engineering","MPhil / PhD","Electronic and Computer Engineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-ece/"],
+["HKUST","Electronic and Computer Engineering","MSc","Electronic Engineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-eleg/"],
+["HKUST","Electronic and Computer Engineering","MSc","Integrated Circuits","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-ic/"],
+["HKUST","Electronic and Computer Engineering","MSc","Telecommunications","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-telecom/"],
+["HKUST","Industrial Engineering and Decision Analytics","MSc","Engineering Enterprise Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-eem/"],
+["HKUST","Industrial Engineering and Decision Analytics","MPhil / PhD","Industrial Engineering and Decision Analytics","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-ieda/"],
+["HKUST","Mechanical and Aerospace Engineering","MSc","Aeronautical Engineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-ae/"],
+["HKUST","Mechanical and Aerospace Engineering","MSc","Intelligent Building Technology and Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-ibtm/"],
+["HKUST","Mechanical and Aerospace Engineering","MPhil / PhD","Mechanical Engineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-mech/"],
+["HKUST","Mechanical and Aerospace Engineering","MSc","Mechanical Engineering","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-mech/"],
+["HKUST","School of Business and Management","DBA","Bilingual Doctor of Business Administration (Bilingual DBA)","https://prog-crs.hkust.edu.hk/pgprog/2025-26/bilingual-dba/"],
+["HKUST","School of Business and Management","EMBA / MBA","Digital MBA for Global Leaders (DiMBA)","https://prog-crs.hkust.edu.hk/pgprog/2025-26/dimba/"],
+["HKUST","School of Business and Management","DBA","Doctor of Business Administration (DBA)","https://prog-crs.hkust.edu.hk/pgprog/2025-26/dba/"],
+["HKUST","School of Business and Management","MSc","Global Finance (joint program with NYU Stern)","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-gfin/"],
+["HKUST","School of Business and Management","EMBA / MBA","HKUST Executive Master of Business Administration (HKUST EMBA)","https://prog-crs.hkust.edu.hk/pgprog/2025-26/hkust-emba/"],
+["HKUST","School of Business and Management","MSc","International Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-imt/"],
+["HKUST","School of Business and Management","EMBA / MBA","Kellogg-HKUST Executive Master of Business Administration (KH EMBA)","https://prog-crs.hkust.edu.hk/pgprog/2025-26/kh-emba/"],
+["HKUST","School of Business and Management","EMBA / MBA","Master of Business Administration (MBA)","https://prog-crs.hkust.edu.hk/pgprog/2025-26/ft-pt-mba/"],
+["HKUST","School of Business and Management","EMBA / MBA","Part-time MBA (Bi-weekly)","https://prog-crs.hkust.edu.hk/pgprog/2025-26/pt-mba-biweekly/"],
+["HKUST","Accounting","MPhil / PhD","Accounting","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-acct/"],
+["HKUST","Accounting","MSc","Accounting","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-acct/"],
+["HKUST","Economics","MPhil / PhD","Economics","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-econ/"],
+["HKUST","Economics","MSc","Economics","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-econ/"],
+["HKUST","Finance","MPhil / PhD","Finance","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-fina/"],
+["HKUST","Finance","MSc","Finance","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-fina/"],
+["HKUST","Information Systems, Business Statistics and Operations Management","MSc","Business Analytics","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-ba/"],
+["HKUST","Information Systems, Business Statistics and Operations Management","MSc","Global Operations","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-go/"],
+["HKUST","Information Systems, Business Statistics and Operations Management","MSc","Information and Cyber Security Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-icsm/"],
+["HKUST","Information Systems, Business Statistics and Operations Management","MPhil / PhD","Information Systems","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-is/"],
+["HKUST","Information Systems, Business Statistics and Operations Management","MSc","Information Systems Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-ism/"],
+["HKUST","Information Systems, Business Statistics and Operations Management","MPhil / PhD","Operations Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-om/"],
+["HKUST","Management","MSc","Family Office and Family Business","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-fofb/"],
+["HKUST","Management","MPhil / PhD","Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-mgmt/"],
+["HKUST","Marketing","MPhil / PhD","Marketing","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-mark/"],
+["HKUST","Marketing","MSc","Marketing","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-mark/"],
+["HKUST","School of Humanities and Social Science","MSc","Global China Studies","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-gcs/"],
+["HKUST","School of Humanities and Social Science","MA","International Language Education","https://prog-crs.hkust.edu.hk/pgprog/2025-26/ma-ile/"],
+["HKUST","Humanities","MA","Chinese Culture","https://prog-crs.hkust.edu.hk/pgprog/2025-26/ma-cc/"],
+["HKUST","Humanities","MPhil / PhD","Humanities","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-huma/"],
+["HKUST","Social Science","MPhil / PhD","Social Science","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-sosc/"],
+["HKUST","Social Science","MA / PGD","Social Science","https://prog-crs.hkust.edu.hk/pgprog/2025-26/pgd-ma-sosc/"],
+["HKUST","Arts and Machine Creativity","MPhil / PhD","Arts and Machine Creativity","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-amc/"],
+["HKUST","Arts and Machine Creativity","MA","Arts and Machine Creativity","https://prog-crs.hkust.edu.hk/pgprog/2025-26/ma-amc/"],
+["HKUST","Emerging Interdisciplinary Areas","MPhil / PhD","Individualized Interdisciplinary Program (Research Area)","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-iip/"],
+["HKUST","Environment and Sustainability","MPhil / PhD","Atmospheric Environmental Science","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-aes/"],
+["HKUST","Environment and Sustainability","MSc / PGD","Environmental Science and Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/pgd-msc-evsm/"],
+["HKUST","Environment and Sustainability","MPhil / PhD","Environmental Science, Policy and Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-espm/"],
+["HKUST","Integrative Systems and Design","MPhil / PhD","Integrative Systems and Design 1","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-isd/"],
+["HKUST","Integrative Systems and Design","MPhil","Technology Innovation and Entrepreneurship","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-tie/"],
+["HKUST","Integrative Systems and Design","MSc","Technology Leadership and Entrepreneurship 2","https://prog-crs.hkust.edu.hk/pgprog/2025-26/msc-tle/"],
+["HKUST","Public Policy","MPM","Public Management","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mpm/"],
+["HKUST","Public Policy","MPhil / PhD","Public Policy","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mphil-phd-pp/"],
+["HKUST","Public Policy","MPP","Public Policy","https://prog-crs.hkust.edu.hk/pgprog/2025-26/mpp/"],
+["PolyU","Faculty of Business","Doctor","Business Administration","https://www.polyu.edu.hk/study/pg/tpg/2026/02007-dfa-dpa"],
+["PolyU","Faculty of Business","Master","Business Administration","https://www.polyu.edu.hk/study/pg/tpg/2026/02021-afm"],
+["PolyU","Faculty of Business","MSc","Business Management","https://www.polyu.edu.hk/study/pg/tpg/2026/02022"],
+["PolyU","Faculty of Business","Doctor","Management","https://www.polyu.edu.hk/study/pg/tpg/2026/02018-tfd-tpd"],
+["PolyU","Faculty of Business","Doctor","Business Administration","https://www.polyu.edu.hk/study/pg/tpg/2026/02023-afd-apd"],
+["PolyU","Faculty of Business","Doctor","Business Management","https://www.polyu.edu.hk/study/pg/tpg/2026/02027-mfd-mpd"],
+["PolyU","Faculty of Business","Doctor","Business Administration","https://www.polyu.edu.hk/study/pg/tpg/2026/02028-hfd-hpd"],
+["PolyU","Faculty of Business","MSc","Asset and Wealth Management","https://www.polyu.edu.hk/study/pg/tpg/2026/02029-dfm-dpm-ffm-fpm"],
+["PolyU","Faculty of Business","MSc/PgD","International Shipping and Transport Logistics","https://www.polyu.edu.hk/study/pg/tpg/2026/44087-ifm-tfp-ipm-tpp"],
+["PolyU","Faculty of Business","MSc","International Shipping and Transport Logistics","https://www.polyu.edu.hk/study/pg/tpg/2026/44087-iss"],
+["PolyU","Faculty of Business","MSc/PgD","Global Supply Chain Management","https://www.polyu.edu.hk/study/pg/tpg/2026/44089-sfm-sfp-gpm-spp"],
+["PolyU","Faculty of Business","MSc","Operations Management","https://www.polyu.edu.hk/study/pg/tpg/2026/44092-ofm-opm"],
+["PolyU","Faculty of Business","MSc","Global Business and Decision Analysis","https://www.polyu.edu.hk/study/pg/tpg/2026/44094-bfm-bpm"],
+["PolyU","Faculty of Business","MSc","Business Analytics","https://www.polyu.edu.hk/study/pg/tpg/2026/23090-maf-map"],
+["PolyU","Faculty of Business","MSc","Human Resource Management","https://www.polyu.edu.hk/study/pg/tpg/2026/23090-mhf-mhp"],
+["PolyU","Faculty of Business","MSc","Marketing Management","https://www.polyu.edu.hk/study/pg/tpg/2026/23090-mkf-mkp"],
+["PolyU","Faculty of Business","MSc","International Management and Leadership","https://www.polyu.edu.hk/study/pg/tpg/2026/23090-mif"],
+["PolyU","Faculty of Business","MSc","Business Analytics","https://www.polyu.edu.hk/study/pg/tpg/2026/23093-mbf-mbp"],
+["PolyU","Faculty of Business","Master/PgD","Professional Accounting","https://www.polyu.edu.hk/study/pg/tpg/2026/21046-maf-paf-mae-pap"],
+["PolyU","Faculty of Business","Master","Corporate Governance","https://www.polyu.edu.hk/study/pg/tpg/2026/21047-cgf-cgp"],
+["PolyU","Faculty of Business","MSc","Accountancy","https://www.polyu.edu.hk/study/pg/tpg/2026/21049-afm-apm"],
+["PolyU","Faculty of Business","Master","Finance (Corporate Finance)","https://www.polyu.edu.hk/study/pg/tpg/2026/21050-cpf"],
+["PolyU","Faculty of Business","Master","Finance (Investment Management)","https://www.polyu.edu.hk/study/pg/tpg/2026/21050-imm"],
+["PolyU","Faculty of Business","Master","Finance (Corporate Finance)","https://www.polyu.edu.hk/study/pg/tpg/2026/21050-mcf"],
+["PolyU","Faculty of Business","Master","Finance (Investment Management)","https://www.polyu.edu.hk/study/pg/tpg/2026/21050-mim"],
+["PolyU","Faculty of Business","MSc","Accounting and Finance Analytics","https://www.polyu.edu.hk/study/pg/tpg/2026/21052-fam-pam"],
+["PolyU","Faculty of Business","MSc","ESG and Sustainability","https://www.polyu.edu.hk/study/pg/tpg/2026/21054-efm-epm"],
+["PolyU","Faculty of Business","MSc","Economics","https://www.polyu.edu.hk/study/pg/tpg/2026/21055-aem-dem"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Applied Mathematics for Science and Technology (Actuarial and Investment Science)","https://www.polyu.edu.hk/study/pg/tpg/2026/63022-aim"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Operational Research and Risk Analysis","https://www.polyu.edu.hk/study/pg/tpg/2026/63024-ofm-opm"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Quantitative Finance and FinTech","https://www.polyu.edu.hk/study/pg/tpg/2026/63029-qfm-qpm"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Mathematics for Artificial Intelligence Technology","https://www.polyu.edu.hk/study/pg/tpg/2026/63031-afm-apm"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Information Technology","https://www.polyu.edu.hk/study/pg/tpg/2026/61030-fit-pit"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Blockchain Technology","https://www.polyu.edu.hk/study/pg/tpg/2026/61036-fbt-pbt"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Metaverse Technology","https://www.polyu.edu.hk/study/pg/tpg/2026/61038"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Cybersecurity","https://www.polyu.edu.hk/study/pg/tpg/2026/61039-fcy-pcy"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Agentic AI Systems","https://www.polyu.edu.hk/study/pg/tpg/2026/61040-fas-pas"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Data Science and Analytics","https://www.polyu.edu.hk/study/pg/tpg/2026/62027-dfm-dpm"],
+["PolyU","Faculty of Computer and Mathematical Sciences","MSc","Artificial Intelligence and Big Data Computing","https://www.polyu.edu.hk/study/pg/tpg/2026/62037-fai-pai"],
+["PolyU","Faculty of Computer and Mathematical Sciences","Doctor","Artificial Intelligence","https://www.polyu.edu.hk/study/pg/tpg/2026/09002-aif-aip"],
+["PolyU","Faculty of Construction and Environment","Doctor","International Real Estate and Construction","https://www.polyu.edu.hk/study/pg/tpg/2026/32109"],
+["PolyU","Faculty of Construction and Environment","MSc","Construction and Real Estate","https://www.polyu.edu.hk/study/pg/tpg/2026/32111-rfm-rpm"],
+["PolyU","Faculty of Construction and Environment","MSc","Project Management","https://www.polyu.edu.hk/study/pg/tpg/2026/32113-pfm-ppm"],
+["PolyU","Faculty of Construction and Environment","MSc","Intelligent Construction","https://www.polyu.edu.hk/study/pg/tpg/2026/32114-ifm-ipm"],
+["PolyU","Faculty of Construction and Environment","MEng","Building Services Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/33082-mef-mep"],
+["PolyU","Faculty of Construction and Environment","MSc","Building Services Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/33084-bem-bsm"],
+["PolyU","Faculty of Construction and Environment","MSc","Facility Management","https://www.polyu.edu.hk/study/pg/tpg/2026/33085-fam-fmm"],
+["PolyU","Faculty of Construction and Environment","MSc","Fire and Safety Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/33086-fem-fsm"],
+["PolyU","Faculty of Construction and Environment","MSc","High Performance Buildings","https://www.polyu.edu.hk/study/pg/tpg/2026/33087-hfm-hpm"],
+["PolyU","Faculty of Construction and Environment","MSc","Carbon Neutral Cities and Urban Sustainability","https://www.polyu.edu.hk/study/pg/tpg/2026/33088-cfm-cpm"],
+["PolyU","Faculty of Construction and Environment","MSc","Civil Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/31077-cfm-cpm"],
+["PolyU","Faculty of Construction and Environment","MSc","Environmental Management and Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/31078-efm-epm"],
+["PolyU","Faculty of Construction and Environment","MSc","Geomatics","https://www.polyu.edu.hk/study/pg/tpg/2026/34084-gfm-gpm"],
+["PolyU","Faculty of Construction and Environment","MSc","Urban Informatics and Smart Cities","https://www.polyu.edu.hk/study/pg/tpg/2026/34083-ifm-ipm"],
+["PolyU","Faculty of Engineering","EngD","Engineering Doctorate","https://www.polyu.edu.hk/study/pg/tpg/2026/05001-fd-pd"],
+["PolyU","Faculty of Engineering","MSc","Aerospace Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/48006-amf-amp"],
+["PolyU","Faculty of Engineering","MSc","Aviation Engineering and Operations Management","https://www.polyu.edu.hk/study/pg/tpg/2026/48005-omf-omp"],
+["PolyU","Faculty of Engineering","MSc","Low-altitude Economy","https://www.polyu.edu.hk/study/pg/tpg/2026/48007-lmf-lmp"],
+["PolyU","Faculty of Engineering","MSc","Satellite Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/48008-smf-smp"],
+["PolyU","Faculty of Engineering","MSc","Biomedical Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/47002-bmf-bmp"],
+["PolyU","Faculty of Engineering","MSc","Sports Technology and Management","https://www.polyu.edu.hk/study/pg/tpg/2026/47005-stf-stp"],
+["PolyU","Faculty of Engineering","MSc","Electrical Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/46010-ee-eet"],
+["PolyU","Faculty of Engineering","MSc","Electronic and Information Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/46011-eie-eit"],
+["PolyU","Faculty of Engineering","MSc","Electric Vehicles","https://www.polyu.edu.hk/study/pg/tpg/2026/46012-ev-evt"],
+["PolyU","Faculty of Engineering","MSc","Microelectronics and Quantum Systems Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/46013-mq-mqt"],
+["PolyU","Faculty of Engineering","MSc/PgD","Engineering Business Management","https://www.polyu.edu.hk/study/pg/tpg/2026/45080-efm-efd-eqm-eqp"],
+["PolyU","Faculty of Engineering","MSc/PgD","Supply Chain and Logistics Management","https://www.polyu.edu.hk/study/pg/tpg/2026/45080-sfm-sfp-sqm-sqp"],
+["PolyU","Faculty of Engineering","MSc","Industrial Logistics Systems","https://www.polyu.edu.hk/study/pg/tpg/2026/45100-mls-ml"],
+["PolyU","Faculty of Engineering","MSc","Knowledge and Technology Management","https://www.polyu.edu.hk/study/pg/tpg/2026/45100-mt-mtt"],
+["PolyU","Faculty of Engineering","MSc","Smart Manufacturing","https://www.polyu.edu.hk/study/pg/tpg/2026/45100-smf-smp"],
+["PolyU","Faculty of Engineering","MSc","Mechanical Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/43100-me-met"],
+["PolyU","Faculty of Engineering","MSc","Intelligent Robotics Engineering","https://www.polyu.edu.hk/study/pg/tpg/2026/43101-ir-irt"],
+["PolyU","Faculty of Engineering","MSc","Sustainable Energy","https://www.polyu.edu.hk/study/pg/tpg/2026/43102-se-set"],
+["PolyU","Faculty of Health and Social Sciences","MA","Mental Health","https://www.polyu.edu.hk/study/pg/tpg/2026/54047-fmh-pmh"],
+["PolyU","Faculty of Health and Social Sciences","MA","Marriage and Family Therapy","https://www.polyu.edu.hk/study/pg/tpg/2026/54047-fmf-pmf"],
+["PolyU","Faculty of Health and Social Sciences","Master","Social Work","https://www.polyu.edu.hk/study/pg/tpg/2026/54047-msw"],
+["PolyU","Faculty of Health and Social Sciences","Doctor","Social Work","https://www.polyu.edu.hk/study/pg/tpg/2026/54053-df-dp"],
+["PolyU","Faculty of Health and Social Sciences","MA","Social Policy and Social Development","https://www.polyu.edu.hk/study/pg/tpg/2026/54055-sdf-sdp"],
+["PolyU","Faculty of Health and Social Sciences","Master","Applied Psychology","https://www.polyu.edu.hk/study/pg/tpg/2026/54057-ft-pt"],
+["PolyU","Faculty of Health and Social Sciences","Master","Applied Psychology (Diverse Learning Needs)","https://www.polyu.edu.hk/study/pg/tpg/2026/54057-lnf-lnp"],
+["PolyU","Faculty of Health and Social Sciences","MA","School and Community Psychology","https://www.polyu.edu.hk/study/pg/tpg/2026/54072-ft-pt"],
+["PolyU","Faculty of Health and Social Sciences","MA","Guidance and Counselling","https://www.polyu.edu.hk/study/pg/tpg/2026/54047-gcf-gcp"],
+["PolyU","Faculty of Health and Social Sciences","MSc","Medical Laboratory Science","https://www.polyu.edu.hk/study/pg/tpg/2026/55005-fmm-pmm"],
+["PolyU","Faculty of Health and Social Sciences","MSc","Medical Imaging and Radiation Science","https://www.polyu.edu.hk/study/pg/tpg/2026/55005-frm-prm"],
+["PolyU","Faculty of Health and Social Sciences","MSc","Medical Physics","https://www.polyu.edu.hk/study/pg/tpg/2026/55005-msf-msp"],
+["PolyU","Faculty of Health and Social Sciences","MSc","Medical Data Science","https://www.polyu.edu.hk/study/pg/tpg/2026/55005-mfd-mpd"],
+["PolyU","Faculty of Health and Social Sciences","Master","Medical Imaging","https://www.polyu.edu.hk/study/pg/tpg/2026/55006"],
+["PolyU","Faculty of Health and Social Sciences","Master","Medical Laboratory Science","https://www.polyu.edu.hk/study/pg/tpg/2026/55007"],
+["PolyU","Faculty of Health and Social Sciences","MSc","Advanced Occupational Therapy","https://www.polyu.edu.hk/study/pg/tpg/2026/51069-otf-otp-onf-onp-mhf-mhp-msf-msp"],
+["PolyU","Faculty of Health and Social Sciences","MSc","Advanced Rehabilitation Sciences","https://www.polyu.edu.hk/study/pg/tpg/2026/51069-rsf-rsp-ddf-ddp"],
+["PolyU","Faculty of Health and Social Sciences","MSc","Advanced Physiotherapy","https://www.polyu.edu.hk/study/pg/tpg/2026/51069-ptf-ptp-pnf-pnp-spf-spp-mpf-mpp"],
+["PolyU","Faculty of Health and Social Sciences","Doctor","Health Science","https://www.polyu.edu.hk/study/pg/tpg/2026/06001-ftd-pt"],
+["PolyU","Faculty of Health and Social Sciences","MSc","Health Informatics","https://www.polyu.edu.hk/study/pg/tpg/2026/06003-hif-hip"],
+["PolyU","Faculty of Health and Social Sciences","MSc","Nursing","https://www.polyu.edu.hk/study/pg/tpg/2026/53070-fts-pt"],
+["PolyU","Faculty of Health and Social Sciences","Master","Nursing","https://www.polyu.edu.hk/study/pg/tpg/2026/53081"],
+["PolyU","Faculty of Health and Social Sciences","MSc","Vision Science and Innovation","https://www.polyu.edu.hk/study/pg/tpg/2026/52049-ftm-ptm"],
+["PolyU","Faculty of Health and Social Sciences","Doctor","Optometry","https://www.polyu.edu.hk/study/pg/tpg/2026/52048-ftd-ptd"],
+["PolyU","Faculty of Humanities","MA","Chinese Culture","https://www.polyu.edu.hk/study/pg/tpg/2026/77002-maf-map"],
+["PolyU","Faculty of Humanities","MA","English Studies for the Professions","https://www.polyu.edu.hk/study/pg/tpg/2026/71026-mcf-mcp-mlf-mlp"],
+["PolyU","Faculty of Humanities","MA","Bilingual Corporate Communication","https://www.polyu.edu.hk/study/pg/tpg/2026/72017-bcf-bcp"],
+["PolyU","Faculty of Humanities","MA","Chinese Linguistics","https://www.polyu.edu.hk/study/pg/tpg/2026/72017-clf-clp"],
+["PolyU","Faculty of Humanities","MA/PgD","Chinese Language and Literature","https://www.polyu.edu.hk/study/pg/tpg/2026/72017-llf-pdf-llp-pdp"],
+["PolyU","Faculty of Humanities","MA","Translating and Interpreting","https://www.polyu.edu.hk/study/pg/tpg/2026/72017-tif-tip"],
+["PolyU","Faculty of Humanities","MA","Teaching Chinese as a Foreign Language","https://www.polyu.edu.hk/study/pg/tpg/2026/72017-tlf-tlp"],
+["PolyU","Faculty of Humanities","Master","Speech Therapy","https://www.polyu.edu.hk/study/pg/tpg/2026/72021"],
+["PolyU","Faculty of Humanities","MSc","Generative AI and the Humanities","https://www.polyu.edu.hk/study/pg/tpg/2026/72026-atf-atp-lcf-lcp"],
+["PolyU","Faculty of Humanities","MA","Global Communication and Event Hosting Arts","https://www.polyu.edu.hk/study/pg/tpg/2026/72029-ehf-ehp"],
+["PolyU","Faculty of Humanities","MA","Translation and Language Technology","https://www.polyu.edu.hk/study/pg/tpg/2026/72030-ttf-ttp"],
+["PolyU","Faculty of Humanities","Doctor","Applied Language Sciences","https://www.polyu.edu.hk/study/pg/tpg/2026/03002-dff-dpt"],
+["PolyU","Faculty of Science","MSc","Sustainable Technology for Carbon Neutrality","https://www.polyu.edu.hk/study/pg/tpg/2026/12060-mft-mpt"],
+["PolyU","Faculty of Science","MSc","Biopharmaceutical Development and Commercialization","https://www.polyu.edu.hk/study/pg/tpg/2026/12062-mft-mpt"],
+["PolyU","Faculty of Science","MSc","Biopharmaceutical Development and Commercialization (internship in Greater Bay Area)","https://www.polyu.edu.hk/study/pg/tpg/2026/12063"],
+["PolyU","Faculty of Science","MSc","Microelectronics Technology and Materials","https://www.polyu.edu.hk/study/pg/tpg/2026/11044"],
+["PolyU","Faculty of Science","MSc","Global Food Safety Management and Risk Analysis","https://www.polyu.edu.hk/study/pg/tpg/2026/15057-mft"],
+["PolyU","Faculty of Science","MSc","Nutrition and Healthy Ageing","https://www.polyu.edu.hk/study/pg/tpg/2026/15058-mft"],
+["PolyU","Faculty of Science","MSc","Nutrition and Healthy Ageing (Nutrition in Practice)","https://www.polyu.edu.hk/study/pg/tpg/2026/15058-npf"],
+["PolyU","Faculty of Science","Doctor","Food Science and Management","https://www.polyu.edu.hk/study/pg/tpg/2026/15059-dft"],
+["PolyU","Faculty of Science","MSc","Dietetics","https://www.polyu.edu.hk/study/pg/tpg/2026/15060"],
+["PolyU","Graduate School","Master","Technology Entrepreneurship","https://www.polyu.edu.hk/study/pg/tpg/2026/07001-fte-pte"],
+["PolyU","School of Design","MSc","Innovative Multimedia Entertainment","https://www.polyu.edu.hk/study/pg/tpg/2026/73040-ftm-ptm"],
+["PolyU","School of Design","Master","Design","https://www.polyu.edu.hk/study/pg/tpg/2026/73035-ibd-ibp-isd-isp-ssd-ssp-ted-tep"],
+["PolyU","School of Design","Doctor","Design","https://www.polyu.edu.hk/study/pg/tpg/2026/73039-ftd-ptd"],
+["PolyU","School of Fashion and Textiles","MA","Fashion Design","https://www.polyu.edu.hk/study/pg/tpg/2026/14111-fpp-dfi"],
+["PolyU","School of Fashion and Textiles","MA","Global Fashion Management","https://www.polyu.edu.hk/study/pg/tpg/2026/14105-ftg-ptg"],
+["PolyU","School of Fashion and Textiles","MA","Sustainable Fashion and Innovation","https://www.polyu.edu.hk/study/pg/tpg/2026/14107-ffs-pfs"],
+["PolyU","School of Fashion and Textiles","MSc/PgD","Intelligent Wearable Technology","https://www.polyu.edu.hk/study/pg/tpg/2026/14110-iwt-pwt-pgd"],
+["PolyU","School of Hotel and Tourism Management","Doctor","Hotel and Tourism Management","https://www.polyu.edu.hk/study/pg/tpg/2026/24036-dfn-dpt"],
+["PolyU","School of Hotel and Tourism Management","MSc","Global Hospitality Business","https://www.polyu.edu.hk/study/pg/tpg/2026/24043"],
+["PolyU","School of Hotel and Tourism Management","MSc","Hospitality and Tourism Management","https://www.polyu.edu.hk/study/pg/tpg/2026/24045-maf-paf-map-pap-mhf-phf-mhp-php-mvf-pvf-mvp-pvp-mwf-pwf-mwp-pwp-mlf-plf-mlp-plp"],
+["CityUHK","CityUHK Academy of Innovation","MSc","MSc Venture Creation","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/cityuhk-academy-of-innovation/cityuhk-academy-of-innovation/p88"],
+["CityUHK","Department of Biomedical Engineering","MSc","MSc Biomedical Engineering","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-biomedicine/department-of-biomedical-engineering/p69"],
+["CityUHK","Department of Biomedical Sciences","MSc","MSc Health Sciences and Biomedicine","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-biomedicine/department-of-biomedical-sciences/p95"],
+["CityUHK","Department of Neuroscience","MSc","MSc Neuroscience","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-biomedicine/department-of-neuroscience/p98"],
+["CityUHK","College of Business","EMBA","Executive Master of Business Administration (Taught in Chinese)","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/college-of-business/p01a"],
+["CityUHK","College of Business","EMBA","Executive Master of Business Administration* (Taught in Chinese)","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/college-of-business/p01b"],
+["CityUHK","College of Business","MBA","Master of Business Administration","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/college-of-business/p11"],
+["CityUHK","College of Business","EMBA","Executive Master of Business Administration (EMBA)","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/college-of-business/p12"],
+["CityUHK","College of Business","MSc","MSc Business and Data Analytics","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/college-of-business/p84"],
+["CityUHK","Department of Accountancy","MA","MA International Accounting","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-accountancy/p02"],
+["CityUHK","Department of Accountancy","MSc","MSc Professional Accounting and Corporate Governance","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-accountancy/p10"],
+["CityUHK","Department of Accountancy","MSc","MSc Accounting and Finance with AI and Fintech Applications*","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-accountancy/p83"],
+["CityUHK","Department of Decision Analytics and Operations","MSc","MSc Operations and Supply Chain Management","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-decision-analytics-and-operations/p09"],
+["CityUHK","Department of Decision Analytics and Operations","MSc","MSc Business and Data Analytics","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/college-of-business/p84"],
+["CityUHK","Department of Economics and Finance","MSc","MSc Finance","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-economics-and-finance/p04"],
+["CityUHK","Department of Economics and Finance","MSc","MSc Applied Economics","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-economics-and-finance/p13"],
+["CityUHK","Department of Economics and Finance","MSc","MSc Financial Engineering","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-economics-and-finance/p15"],
+["CityUHK","Department of Information Systems","MSc","MSc Business Information Systems (Management of Intelligent Systems Stream)","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-information-systems/p05a"],
+["CityUHK","Department of Information Systems","MSc","MSc Business Information Systems (Financial and Intelligent Technology Stream)","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-information-systems/p05b"],
+["CityUHK","Department of Information Systems","MSc","MSc Digital Transformation and Technological Innovation","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-information-systems/p16"],
+["CityUHK","Department of Information Systems","MSc","MSc Electronic Commerce","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-computing/department-of-computer-science/p17"],
+["CityUHK","Department of Information Systems","MSc","MSc Business and Data Analytics","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/college-of-business/p84"],
+["CityUHK","Department of Information Systems","MSc","MSc Artificial Intelligence in Business","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-information-systems/p85"],
+["CityUHK","Department of Management","MA","MA Global Business Management","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-management/p07"],
+["CityUHK","Department of Management","MSc","MSc Management and Innovation","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-management/p19"],
+["CityUHK","Department of Marketing","MSc","MSc Marketing","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-business/department-of-marketing/p18"],
+["CityUHK","Department of Biostatistics","MSc","MSc Biostatistics","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-computing/department-of-biostatistics/p97"],
+["CityUHK","Department of Computer Science","MSc","MSc Electronic Commerce","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-computing/department-of-computer-science/p17"],
+["CityUHK","Department of Computer Science","MSc","MSc Computer Science","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-computing/department-of-computer-science/p53"],
+["CityUHK","Department of Computer Science","MSc","MSc Artificial Intelligence","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-computing/department-of-computer-science/p75"],
+["CityUHK","Department of Computer Science","MSc","MSc Cybersecurity","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-computing/department-of-computer-science/p91"],
+["CityUHK","Department of Data Science","MSc","MSc Data Science","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-computing/department-of-data-science/p70"],
+["CityUHK","Department of Data Science","MSc","MSc Artificial Intelligence for Sciences","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-computing/department-of-data-science/p79"],
+["CityUHK","Department of Architecture and Civil Engineering","MSc","MSc Construction Management","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-architecture-and-civil-engineering/p52"],
+["CityUHK","Department of Architecture and Civil Engineering","MSc","MSc Civil and Architectural Engineering","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-architecture-and-civil-engineering/p60"],
+["CityUHK","Department of Architecture and Civil Engineering","MUD","Master of Urban Design and Regional Planning","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-architecture-and-civil-engineering/p64"],
+["CityUHK","Department of Architecture and Civil Engineering","MArch","Master of Architecture","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-architecture-and-civil-engineering/p82"],
+["CityUHK","Department of Electrical Engineering","MSc","MSc Electrical and Electronic Engineering","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-electrical-engineering/p54"],
+["CityUHK","Department of Electrical Engineering","MSc","MSc Computer and Information Engineering","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-electrical-engineering/p59"],
+["CityUHK","Department of Materials Science and Engineering","MSc","MSc Materials Engineering and Nanotechnology","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-materials-science-and-engineering/p58"],
+["CityUHK","Department of Mechanical Engineering","MSc","MSc Mechanical Engineering","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-mechanical-engineering/p66"],
+["CityUHK","Department of Systems Engineering","MSc","MSc Engineering Management","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-systems-engineering/p56"],
+["CityUHK","Department of Systems Engineering","MSc","MSc Intelligent Semiconductor Manufacturing","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-systems-engineering/p86"],
+["CityUHK","Department of Systems Engineering","MSc","MSc AI-Driven Innovation","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-engineering/department-of-systems-engineering/p89"],
+["CityUHK","College of Liberal Arts and Social Sciences","MSocSc","MSocSc Cross Sectoral Leadership (Taught in Chinese)","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/college-of-liberal-arts-and-social-sciences/p92"],
+["CityUHK","Department of Chinese and History","MA","MA Chinese and History","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-chinese-and-history/p34"],
+["CityUHK","Department of English","MA","MA English Studies","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-english/p40"],
+["CityUHK","Department of Linguistics and Translation","MA","MA Language Studies","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-linguistics-and-translation/p30"],
+["CityUHK","Department of Media and Communication","MA","MA Communication and New Media","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-media-and-communication/p25"],
+["CityUHK","Department of Media and Communication","MA","MA Integrated Marketing Communication","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-media-and-communication/p39"],
+["CityUHK","Department of Public and International Affairs","MA","MA Public Policy and Management","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-public-and-international-affairs/p27"],
+["CityUHK","Department of Public and International Affairs","MSocSc","MSocSc Sustainability and Development Studies","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-public-and-international-affairs/p37"],
+["CityUHK","Department of Public and International Affairs","MA","MA International Studies","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-public-and-international-affairs/p38"],
+["CityUHK","Department of Public and International Affairs","MA","MA Housing and Urban Management","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-public-and-international-affairs/p78"],
+["CityUHK","Department of Social and Behavioural Sciences","MSocSc","MSocSc Counselling","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-social-and-behavioural-sciences/p20"],
+["CityUHK","Department of Social and Behavioural Sciences","MSW","Master of Social Work","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-social-and-behavioural-sciences/p71"],
+["CityUHK","Department of Social and Behavioural Sciences","MSocSc","MSocSc Psychology","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-social-and-behavioural-sciences/p76"],
+["CityUHK","Department of Social and Behavioural Sciences","MA","MA Applied Social Sciences","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-liberal-arts-and-social-sciences/department-of-social-and-behavioural-sciences/p77"],
+["CityUHK","Department of Chemistry","MSc","MSc Chemistry","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-science/department-of-chemistry/p67"],
+["CityUHK","Department of Mathematics","MSc","MSc Financial Mathematics and Statistics","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-science/department-of-mathematics/p68"],
+["CityUHK","Department of Physics","MSc","MSc Physics with Data Modelling and Quantum Technologies","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/college-of-science/department-of-physics/p50"],
+["CityUHK","Department of Infectious Diseases and Public Health","MPH","Master of Public Health","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/jockey-club-college-of-veterinary-medicine-and-life-sciences/department-of-infectious-diseases-and-public-health/p96"],
+["CityUHK","Department of Veterinary Clinical Sciences","MVM","Master of Veterinary Medicine","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/jockey-club-college-of-veterinary-medicine-and-life-sciences/department-of-veterinary-clinical-sciences/p99"],
+["CityUHK","School of Creative Media","MFA","MFA Creative Media","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/school-of-creative-media/school-of-creative-media/p80"],
+["CityUHK","School of Creative Media","MA","MA Creative Media","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/school-of-creative-media/school-of-creative-media/p81"],
+["CityUHK","School of Energy and Environment","MSc","MSc Energy and Environment","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/school-of-energy-and-environment/school-of-energy-and-environment/p63"],
+["CityUHK","School of Law","LLM","Master of Laws in Arbitration and Dispute Resolution","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/school-of-law/school-of-law/p41"],
+["CityUHK","School of Law","JD","Juris Doctor","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/school-of-law/school-of-law/p43"],
+["CityUHK","School of Law","PCLL","Postgraduate Certificate in Laws","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/school-of-law/school-of-law/p45"],
+["CityUHK","School of Law","LLM","Master of Laws","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/school-of-law/school-of-law/p46"],
+["CityUHK","School of Law","PgCert","Postgraduate Certificate in Patent Law","https://www.cityu.edu.hk/en/pg/programme/program-list/2026/school-of-law/school-of-law/p93"],
+["HKBU","Faculty of Arts and Social Sciences","MA","Master of Arts (MA) in Ethics and Public Affairs","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-ethics-and-public-affairs"],
+["HKBU","Faculty of Arts and Social Sciences","MA","Master of Arts (MA) in Creative Writing for Cultural Professionals","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-creative-writing-for-cultural-professionals"],
+["HKBU","Faculty of Arts and Social Sciences","MA","Master of Arts (MA) in Chinese Literature, Language and Culture","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-chinese-literature-language-and-culture"],
+["HKBU","Faculty of Arts and Social Sciences","MA","Master of Arts (MA) in Global Society","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-global-society"],
+["HKBU","Faculty of Arts and Social Sciences","MA","Master of Arts (MA) in Language Studies","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-language-studies"],
+["HKBU","Faculty of Arts and Social Sciences","MA","Master of Arts (MA) in Literary and Comparative Studies","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-literary-and-comparative-studies"],
+["HKBU","Faculty of Arts and Social Sciences","MA","Master of Arts (MA) in Translation and Bilingual Communication","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-translation-and-bilingual-communication"],
+["HKBU","Faculty of Arts and Social Sciences","MEd","Master of Education (MEd)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-education-med"],
+["HKBU","Faculty of Arts and Social Sciences","MPA","Master of Public Administration (MPA)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-public-administration-mpa"],
+["HKBU","Faculty of Arts and Social Sciences","MSocSc","Master of Social Sciences (MSocSc) (Contemporary China Studies)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-social-sciences-msocsc-contemporary-china-studies"],
+["HKBU","Faculty of Arts and Social Sciences","MSocSc","Master of Social Sciences (MSocSc) in Counselling","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-social-sciences-msocsc-in-counselling"],
+["HKBU","Faculty of Arts and Social Sciences","MSocSc","Master of Social Sciences (MSocSc) in Psychology","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-social-sciences-msocsc-in-psychology"],
+["HKBU","Faculty of Arts and Social Sciences","MSocSc","Master of Social Sciences (MSocSc) in Smart, Resilient and Sustainable Cities","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-social-sciences-msocsc-in-smart-resilient-and-sustainable-cities"],
+["HKBU","Faculty of Arts and Social Sciences","MSocSc","Master of Social Sciences (MSocSc) in Social Work","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-social-sciences-msocsc-in-social-work"],
+["HKBU","Faculty of Arts and Social Sciences","MSocSc","Master of Social Sciences (MSocSc) in Sport and Leisure Management","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-social-sciences-msocsc-in-sport-and-leisure-management"],
+["HKBU","Faculty of Arts and Social Sciences","MSW","Master of Social Work (MSW)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-social-work-msw"],
+["HKBU","Faculty of Arts and Social Sciences","MA","(Zhuhai, BNBU campus) Master of Arts (MA) in Sports Health and Communication Concentration","https://ar.hkbu.edu.hk/tpg-admissions/programmes/zhuhai-bnbu-campus-master-of-arts-ma-in-sports-health-and-communication-concentration-shc"],
+["HKBU","Faculty of Arts and Social Sciences","MSW","(Zhuhai, BNBU campus) Master of Social Work (MSW) (Part-time)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/zhuhai-uic-campus-master-of-social-work-msw-part-time"],
+["HKBU","School of Business","EMBA","Executive Master of Business Administration (Business + Communication in the AI Age)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/executive-master-of-business-administration-business-communication-in-the-ai-age"],
+["HKBU","School of Business","DBA","Doctor of Business Administration (DBA)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/doctor-of-business-administration-dba"],
+["HKBU","School of Business","MSc","Master of Science in Family Office Management","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-in-family-office-management"],
+["HKBU","School of Business","MAcc","Master of Accountancy (MAcc)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-accountancy-macc"],
+["HKBU","School of Business","MBA","Master of Business Administration (MBA) (Mainland Class only)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-business-administration-mba-mainland-class-only"],
+["HKBU","School of Business","MHRM","Master of Human Resources Management (MHRM)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-human-resources-management-mhrm"],
+["HKBU","School of Business","MSc","Master of Science (MSc) in AI for Business","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-ai-for-business"],
+["HKBU","School of Business","MSc","Master of Science (MSc) in Applied Accounting and Finance","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-applied-accounting-and-finance"],
+["HKBU","School of Business","MSc","Master of Science (MSc) in Applied Economics","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-applied-economics"],
+["HKBU","School of Business","MSc","Master of Science (MSc) in Business Management","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-business-management"],
+["HKBU","School of Business","MSc","Master of Science (MSc) in Corporate Governance and Compliance","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-corporate-governance-and-compliance"],
+["HKBU","School of Business","MSc","Master of Science (MSc) in Data Analytics and Business Economics","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-data-analytics-and-business-economics"],
+["HKBU","School of Business","MSc","Master of Science (MSc) in Entrepreneurship and Global Marketing","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-entrepreneurship-and-global-marketing"],
+["HKBU","School of Business","MSc","Master of Science (MSc) in Finance (FinTech and Financial Analytics)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-finance-fintech-and-financial-analytics"],
+["HKBU","School of Business","MSc","Master of Science (MSc) in Marketing for the Creative Economy","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-marketing-for-the-creative-economy"],
+["HKBU","School of Business","MAcc","(Zhuhai, BNBU campus) Master of Accountancy","https://ar.hkbu.edu.hk/tpg-admissions/programmes/zhuhai-bnbu-campus-master-of-accountancy"],
+["HKBU","School of Creative Arts","MFA","Master of Fine Arts (MFA) in Cinematic Arts and Creative Practice","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-fine-arts-mfa-in-cinematic-arts-and-creative-practice"],
+["HKBU","School of Creative Arts","MA","Master of Arts (MA) in Producing for Film, Television and New Media","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-producing-for-film-television-and-new-media"],
+["HKBU","School of Creative Arts","MA","Master of Arts (MA) in Music","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-music"],
+["HKBU","School of Creative Arts","MA","Master of Arts (MA) in Visual Arts","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-visual-arts"],
+["HKBU","School of Creative Arts","MSc","Master of Science (MSc) in Marketing for the Creative Economy","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-marketing-for-the-creative-economy"],
+["HKBU","Faculty of Science","MSc","Master of Science (MSc) in AI and Digital Media","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-ai-and-digital-media"],
+["HKBU","Faculty of Science","MA","(Zhuhai, BNBU campus) Master of Arts (MA) in Communication","https://ar.hkbu.edu.hk/tpg-admissions/programmes/zhuhai-bnbu-campus-master-of-arts-ma-in-communication"],
+["HKBU","Faculty of Science","MSc","Master of Science (MSc) in Green Technology (Energy)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-green-technology-energy"],
+["HKBU","Faculty of Science","MSc","Master of Science (MSc) in Information Technology Management","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-information-technology-management"],
+["HKBU","Faculty of Science","MSc","Master of Science (MSc) in Operational Research & Business Statistics","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-operational-research-and-business-statistics"],
+["HKBU","Faculty of Science","MSc","Master of Science (MSc) in Mathematical Finance","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-mathematical-finance"],
+["HKBU","Faculty of Science","MSc","Master of Science (MSc) in Analytical Chemistry","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-analytical-chemistry"],
+["HKBU","Faculty of Science","MSc","Master of Science (MSc) in Environmental and Public Health Management","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-environmental-and-public-health-management"],
+["HKBU","Faculty of Science","MSc","Master of Science (MSc) in Data Analytics and Artificial Intelligence","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-data-analytics-and-artificial-intelligence"],
+["HKBU","Faculty of Science","MSc","(Zhuhai, BNBU campus) Master of Science (MSc) in Data Science with Concentration in Business Statistics","https://ar.hkbu.edu.hk/tpg-admissions/programmes/zhuhai-uic-campus-master-of-science-msc-in-data-science-with-concentration-in-business-statistics"],
+["HKBU","Faculty of Science","MSc","(Zhuhai, BNBU campus) Master of Science (MSc) - Sustainable Energy Technology and Management","https://ar.hkbu.edu.hk/tpg-admissions/programmes/zhuhai-uic-campus-master-of-science-msc-sustainable-energy-technology-and-management"],
+["HKBU","School of Chinese Medicine","MSc","Master of Science (MSc) in Personal Health Management (Chinese Medicine) (MHM)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-personal-health-management-chinese-medicine-mhm"],
+["HKBU","School of Chinese Medicine","MSc","Master of Science (MSc) in Drug Discovery (Modernization of Chinese Medicine) (MDD)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-drug-discovery-modernization-of-chinese-medicine-mdd"],
+["HKBU","School of Chinese Medicine","MPS","Master of Pharmaceutical Sciences in Chinese Medicine (MPS)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-pharmaceutical-sciences-in-chinese-medicine-mps"],
+["HKBU","School of Chinese Medicine","MCM","Master of Chinese Medicine (MCM)","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-chinese-medicine-mcm"],
+["HKBU","School of Communication","MA","Master of Arts (MA) in Communication","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-communication"],
+["HKBU","School of Communication","MA","Master of Arts (MA) in International Journalism Studies","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-arts-ma-in-international-journalism-studies"],
+["HKBU","School of Communication","MSc","Master of Science (MSc) in AI and Digital Media","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-science-msc-in-ai-and-digital-media"],
+["HKBU","School of Communication","MSocSc","Master of Social Sciences (MSocSc) in Media Management","https://ar.hkbu.edu.hk/tpg-admissions/programmes/master-of-social-sciences-msocsc-in-media-management"],
+["HKBU","School of Communication","MA","(Zhuhai, BNBU campus) Master of Arts (MA) in Communication","https://ar.hkbu.edu.hk/tpg-admissions/programmes/zhuhai-bnbu-campus-master-of-arts-ma-in-communication"],
+["LingU","Faculty of Arts","Master","Master of Arts in Artificial Intelligence and the Future","https://www.ln.edu.hk/philoso/hkcrc/maaif"],
+["LingU","Faculty of Arts","Master","Master of Arts in Chinese","https://www.ln.edu.hk/chi/machi"],
+["LingU","Faculty of Arts","Master","Master of Arts in Creative and Media Industries","https://www.ln.edu.hk/daci/macmi"],
+["LingU","Faculty of Arts","Master","Master of Arts in Curating and Art History","https://www.ln.edu.hk/daci/macah"],
+["LingU","Faculty of Arts","Master","Master of Arts in Digital English Studies","https://www.ln.edu.hk/eng/mades"],
+["LingU","Faculty of Arts","Master","Master of Arts in Digital History in Global Asia","https://www.ln.edu.hk/history/programmes/dhga"],
+["LingU","Faculty of Arts","Master","Master of Arts in Translation Studies","https://www.ln.edu.hk/tran/programmes/mats/"],
+["LingU","Faculty of Arts","Master","Master of Cultural Studies","https://www.ln.edu.hk/cultural/programmes/mcs/"],
+["LingU","Faculty of Business","Doctor","Doctor of Business Administration in Global Digital Economy and Governance","https://www.ln.edu.hk/fb/dba/"],
+["LingU","Faculty of Business","Doctor","Doctor of Business Studies","https://www.ln.edu.hk/fb/dbs"],
+["LingU","Faculty of Business","Master","Master of Accountancy","http://ln.edu.hk/acct/macc"],
+["LingU","Faculty of Business","Master","Master of Science in Arts Technology and Business","https://www.ln.edu.hk/fb/mscatb/home"],
+["LingU","Faculty of Business","Master","Master of Science in Business Innovation and Entrepreneurship","https://www.ln.edu.hk/fb/mscbie"],
+["LingU","Faculty of Business","Master","Master of Science in eBusiness and Supply Chain Management","https://www.ln.edu.hk/orm/ebscm"],
+["LingU","Faculty of Business","Master","Master of Science in Environmental, Social, and Governance Management","https://www.ln.edu.hk/acct/mscesgm/"],
+["LingU","Faculty of Business","Master","Master of Science in Finance","https://www.ln.edu.hk/fin/mfin"],
+["LingU","Faculty of Business","Master","Master of Science in Human Resource and Organisational Management","https://www.ln.edu.hk/mgt/hrom"],
+["LingU","Faculty of Business","Master","Master of Science in Marketing and International Business","https://www.ln.edu.hk/mkt/mscmib/"],
+["LingU","Faculty of Business","Master","Master of Science in Risk, Insurance and Actuarial Analytics","https://www.ln.edu.hk/orm/mscriaa"],
+["LingU","Faculty of Social Sciences","Master","Master of Arts in International Affairs","https://www.ln.edu.hk/gia/maia/"],
+["LingU","Faculty of Social Sciences","Master","Master of Science in International and Development Economics","https://www.ln.edu.hk/econ/mide/"],
+["LingU","Faculty of Social Sciences","Master","Master of Science in International Banking and Finance","https://www.ln.edu.hk/econ/mibf/"],
+["LingU","Faculty of Social Sciences","Master","Master of Science in Work and Organisational Psychology","https://www.ln.edu.hk/psy/mwop"],
+["LingU","Faculty of Social Sciences","Master","Master of Social Sciences in Applied Psychology","https://www.ln.edu.hk/psy/mssap/home"],
+["LingU","Faculty of Social Sciences","Master","Master of Social Sciences in Comparative Social Policy (International)","https://www.ln.edu.hk/socsp/imcsp"],
+["LingU","Faculty of Social Sciences","Master","Master of Social Sciences in Organisational Psychology and Education Management","https://www.ln.edu.hk/psy/opem"],
+["LingU","Faculty of Social Sciences","Master","Master of Social Sciences in Sociology and Data Analytics","https://www.ln.edu.hk/socsp/msoda"],
+["LingU","School of Data Science","Doctor","Doctor of Artificial Intelligence Studies","https://www.ln.edu.hk/sds/dai/dais"],
+["LingU","School of Data Science","Master","Master of Research in Advanced Data Science","https://www.ln.edu.hk/sds/dai/ads"],
+["LingU","School of Data Science","Master","Master of Science in Artificial Intelligence and Business Analytics","https://www.ln.edu.hk/sds/dai/mscaiba"],
+["LingU","School of Data Science","Master","Master of Science in Data Science","https://www.ln.edu.hk/sds/dai/mscds"],
+["LingU","School of Data Science","Master","Master of Science in Industrial Data Analytics","https://www.ln.edu.hk/sds/dids/ida"],
+["LingU","School of Data Science","Master","Master of Science in Smart City Technologies and Applications","https://www.ln.edu.hk/sds/dids/scta"],
+["LingU","School of Graduate Studies","Doctor","Doctor of Policy Studies","https://www.ln.edu.hk/sgs/doctor/policy-studies/"],
+["LingU","School of Graduate Studies","Master","Master of Arts in Arts and Cultural Heritage Management","https://www.ln.edu.hk/sgs/achm"],
+["LingU","School of Graduate Studies","Master","Master of Arts in International Higher Education and Management","https://www.ln.edu.hk/sgs/ihem"],
+["LingU","School of Graduate Studies","Master","Master of Arts in Social Entrepreneurship and Innovation Management","https://www.ln.edu.hk/sgs/seim"],
+["LingU","School of Graduate Studies","Master","Master of China and Regional Development Studies","https://www.ln.edu.hk/sgs/crds"],
+["LingU","School of Graduate Studies","Master","Master of Cities and Governance","https://www.ln.edu.hk/sgs/mcg/"],
+["LingU","School of Graduate Studies","Master","Master of Housing Policy and Management","https://www.ln.edu.hk/sgs/mhpm"],
+["LingU","School of Graduate Studies","Master","Master of Science in Health Analytics and Management","https://www.ln.edu.hk/sgs/ham"],
+["LingU","School of Graduate Studies","Master","Master of Science in Global Humanitarian Innovation and Technology","https://www.ln.edu.hk/sgs/ghit"],
+["LingU","School of Graduate Studies","Master","Master of Science in Smart Ageing and Gerontology","https://www.ln.edu.hk/sgs/sag/home"],
+["LingU","School of Graduate Studies","Master","Master of Social Sciences in Comparative Public Administration","https://www.ln.edu.hk/sgs/cpa"],
+["LingU","School of Graduate Studies","Master","Master of Social Sciences in Health and Social Services Management","https://www.ln.edu.hk/sgs/mhsm"],
+["LingU","Wu Jieh Yee School of Interdisciplinary Studies","Doctor","Doctor of Smart Manufacturing","https://www.ln.edu.hk/wjysis/dsm"],
+["LingU","Wu Jieh Yee School of Interdisciplinary Studies","Master","Master of Liberal Sciences","https://www.ln.edu.hk/wjysis/mls"],
+["LingU","Wu Jieh Yee School of Interdisciplinary Studies","Master","Master of Science in Cross-disciplinary Technologies+","https://www.ln.edu.hk/chs/wjysis/mct"],
+["LingU","Wu Jieh Yee School of Interdisciplinary Studies","Master","Master of Science in Sustainability and Environmental Analytics","https://www.ln.edu.hk/scienceunit/sea"],
+["EdUHK","Graduate School","PhD","Doctor of Philosophy [PhD]","https://gs.eduhk.hk/prospective/rpg/"],
+["EdUHK","Graduate School","MPhil","Master of Philosophy [MPhil]","https://gs.eduhk.hk/prospective/rpg/"],
+["EdUHK","Graduate School","EdD","Doctor of Education [EdD]","https://gs.eduhk.hk/prospective/edd/"],
+["EdUHK","Graduate School","EdD(Chinese)","Doctor of Education (Chinese) [EdD(Chinese)]","https://gs.eduhk.hk/prospective/eddchi/"],
+["EdUHK","Graduate School","EMPAL","Executive Master of Public Administration and Leadership [EMPAL]","https://aapsef.eduhk.hk/en/study/prospective-students/academic-programmes/empal"],
+["EdUHK","Graduate School","MA","Master of Arts in Belt and Road Business Communication and Administration [MA(BRBCA)]","https://aedi.eduhk.hk/programmes/postgraduate-programmes/master-of-arts-in-belt-and-road-business-communication-and-administration"],
+["EdUHK","Graduate School","MA","Master of Arts in Chinese Values-Based Leadership Education [MA(CVBLE]","https://aedi.eduhk.hk/programmes/postgraduate-programmes/master-of-arts-in-chinese-values-based-leadership-education"],
+["EdUHK","Graduate School","MA","Master of Arts in Comparative Education and Collaborative Innovation [MA(CECI)]","https://aedi.eduhk.hk/programmes/postgraduate-programmes/master-of-arts-in-comparative-education-and-collaborative-innovation"],
+["EdUHK","Graduate School","MA","Master of Arts in Digital Human Resource Management and Organisational Marketing [MA(DHRMOM)]","https://aedi.eduhk.hk/programmes/postgraduate-programmes/master-of-arts-in-digital-human-resource-management-and-organisational-marketing"],
+["EdUHK","Graduate School","MA","Master of Arts in Digital Marketing and E-Commerce [MA(DMEC)]","https://aedi.eduhk.hk/programmes/postgraduate-programmes/master-of-arts-in-digital-marketing-and-e-commerce"],
+["EdUHK","Graduate School","MA","Master of Arts in Emerging Technology for Future Workforce [MA(ETFW)]","https://aapsef.eduhk.hk/study/prospective-students/academic-programmes/master-of-arts-in-emerging-technology-for-future-workforce-ma-etfw-subject-to-the-university-s-approval"],
+["EdUHK","Graduate School","MA","Master of Arts in E-Sports Management [MA(ESM)]","https://aedi.eduhk.hk/programmes/postgraduate-programmes/master-of-arts-in-e-sports-management"],
+["EdUHK","Graduate School","MA","Master of Arts in Global Higher Education [MA(GlobalHE)]","https://aapsef.eduhk.hk/study/prospective-students/academic-programmes/master-of-arts-in-global-higher-education-maghe"],
+["EdUHK","Graduate School","MA","Master of Arts in Mindfulness and Life Education [MA(MLE)]","https://aedi.eduhk.hk/programmes/postgraduate-programmes/master-of-arts-in-mindfulness-and-life-education"],
+["EdUHK","Graduate School","MA","Master of Arts in New Media and Social Media [MA(NMSM)]","https://aedi.eduhk.hk/programmes/postgraduate-programmes/master-of-arts-in-new-media-and-social-media"],
+["EdUHK","Graduate School","MA","Master of Arts in Science and Robotics Education [MA(SRE)]","https://aedi.eduhk.hk/programmes/postgraduate-programmes/master-of-arts-in-science-and-robotics-education"],
+["EdUHK","Graduate School","LLM","Master of Laws in National Security Law [LLM(NSL)]","https://aapsef.eduhk.hk/study/prospective-students/academic-programmes/LLMNSL"],
+["EdUHK","Graduate School","LLM","Master of Laws in Digital Governance [LLM(DG)]","https://aapsef.eduhk.hk/study/prospective-students/academic-programmes/master-of-laws-in-digital-governance"],
+["EdUHK","Graduate School","MOT","Master of Occupational Therapy [MOT]","https://aapsef.eduhk.hk/study/prospective-students/academic-programmes/master-of-occupational-therapy"],
+["EdUHK","Graduate School","MSc","Master of Science in Artificial Intelligence for Executive Professionals [MSc(AIEP)]","https://www.aidcec.eduhk.hk/msc-aiep/"],
+["EdUHK","Graduate School","MSc","Master of Science in Educational Neuroscience [MSc(EdN)]","https://aedi.eduhk.hk/programmes/postgraduate-programmes/master-of-science-in-educational-neuroscience"],
+["EdUHK","Graduate School","MSc","Master of Science in Environmental, Social and Governance for Sustainable Development [MSc(ESGSD)]","https://aapsef.eduhk.hk/study/prospective-students/academic-programmes/ESGSD"],
+["EdUHK","Graduate School","MEd","Master of Education [MEd]","https://www.eduhk.hk/gradsch/index.php/prospective-students/master-of-education-for-prospective-students.html"],
+["EdUHK","Registry","MA","Master of Arts in Child and Family Education [MA(CFE)]","https://www.eduhk.hk/fehd/en/programmes.php?id=705"],
+["EdUHK","Registry","MA","Master of Arts in Chinese Studies (Language Education) [MACSLE]","https://www.eduhk.hk/fhm/postgraduate-programme/master-of-arts-in-chinese-studies-language-education-macsle"],
+["EdUHK","Registry","MA","Master of Arts in Cultural Heritage Education and Management [MA(CHEM)]","https://www.eduhk.hk/fehd/en/programmes.php?id=9118"],
+["EdUHK","Registry","MA","Master of Arts in Digital Humanities for Cultural Professionals [MADHCP]","https://www.eduhk.hk/fhm/postgraduate-programme/master-of-arts-in-digital-humanities-for-cultural-professionals-madhcp"],
+["EdUHK","Registry","MA","Master of Arts in Education for Sustainability [MA(EfS)]","https://maefs.eduhk.hk/"],
+["EdUHK","Registry","MA","Master of Arts in Educational Counselling [MA(EC)]","https://www.eduhk.hk/fehd/en/programmes.php?id=230"],
+["EdUHK","Registry","MA","Master of Arts in Global Histories of Education [MAGHE]","https://www.eduhk.hk/fhm/postgraduate-programme/master-of-arts-in-global-histories-of-education-maghe/"],
+["EdUHK","Registry","MA","Master of Arts in Global Studies in Education [MA(GSE)]","https://www.eduhk.hk/fehd/en/programmes.php?id=6838"],
+["EdUHK","Registry","MA","Master of Arts in Inclusive Early Childhood Education [MA(IECE)]","https://www.eduhk.hk/fehd/en/programmes.php?id=9840"],
+["EdUHK","Registry","MA","Master of Arts in Intercultural Communication and Translation [MAICT]","https://www.eduhk.hk/fhm/postgraduate-programme/master-of-arts-in-intercultural-communication-and-translation-maict"],
+["EdUHK","Registry","MA","Master of Arts in Mathematics and Pedagogy [MA(MP)]","http://www.eduhk.hk/mamp/"],
+["EdUHK","Registry","MA","Master of Arts in Music Education [MA(ME)]","http://www.eduhk.hk/mame/"],
+["EdUHK","Registry","MA","Master of Arts in Personal Finance Education [MA(PFE)]","https://www.eduhk.hk/ssps/mapfe"],
+["EdUHK","Registry","MA","Master of Arts in Positive Psychology in Education [MA(PPE)]","https://www.eduhk.hk/fehd/en/programmes.php?id=4788"],
+["EdUHK","Registry","MA","Master of Arts in STEM Education [MA(STEM Ed)]","https://mastem.eduhk.hk/"],
+["EdUHK","Registry","MA","Master of Arts in Teaching Chinese as an International Language [MATCIL]","https://www.eduhk.hk/fhm/postgraduate-programme/master-of-arts-in-teaching-chinese-as-an-international-language-matcil"],
+["EdUHK","Registry","MA","Master of Arts in Teaching English to Speakers of Other Languages [MATESOL]","https://www.eduhk.hk/fhm/en/page/matesol-homepage"],
+["EdUHK","Registry","MA","Master of Arts in Visual Arts Education and Creative Practice [MA(VAECP)]","https://mavaecp.eduhk.hk/"],
+["EdUHK","Registry","MPPM","Master of Public Policy and Management [MPPM]","https://www.eduhk.hk/ssps/mppm"],
+["EdUHK","Registry","MSc","Master of Science in Applied Data Science [MSc(ADS)]","https://www.eduhk.hk/mit/en/mscads"],
+["EdUHK","Registry","MSc","Master of Science in Artificial Intelligence and Educational Technology [MSc(AI&EdTech)]","https://www.eduhk.hk/mit/en/mscait"],
+["EdUHK","Registry","MSc","Master of Science in Education Policy and Management [MSc(EPM)] (English medium)","https://www.eduhk.hk/fehd/en/programmes.php?id=9861"],
+["EdUHK","Registry","MSc","Master of Science in Education Policy and Management [MSc(EPM)] (Chinese medium)","https://www.eduhk.hk/fehd/tc/programmes.php?s=programme_detail%20pg&id=10214"],
+["EdUHK","Registry","MSc","Master of Science in Educational Speech-Language Pathology and Learning Disabilities [MScESLPLD]","https://www.eduhk.hk/fehd/en/programmes.php?id=231"],
+["EdUHK","Registry","MSc","Master of Science in Learning Sciences and Smart Education [MSc(LSSE)]","https://www.eduhk.hk/fehd/en/programmes.php?id=9112"],
+["EdUHK","Registry","MSocSc","Master of Social Sciences in Educational Psychology [MSocSc(EP)]","https://www.eduhk.hk/fehd/en/programmes.php?id=9859"],
+["EdUHK","Registry","MSocSc","Master of Social Sciences in Psychology (Schools and Community Settings) [MSocScP(SCS)]","https://www.eduhk.hk/fehd/en/programmes.php?id=826"],
+["EdUHK","Registry","MSocSc","Master of Social Sciences in Sports Coaching and Management [MSocSc(SCM)]","https://www.eduhk.hk/hpe/en/Programmes/Master-Programme/Master-Of-Social-Sciences-In-Sports-Coaching-And-Management.html"],
+["EdUHK","Registry","MSocSc","Master of Social Sciences in Therapeutic Play and Well-Being [MSocSc(TPWB)]","https://www.eduhk.hk/hpe/en/Programmes/Master-Programme/Msstpwb.html"],
+["EdUHK","Registry","MTeach","Master of Teaching [MTeach]","https://www.eduhk.hk/fehd/en/programmes.php?id=724"],
+["HKMU","School of Arts and Social Sciences","MA","Master of Arts in Applied Cultural Studies","https://www.hkmu.edu.hk/as/programmes-courses/tpg/maacsf/"],
+["HKMU","School of Arts and Social Sciences","MA","Master of Arts in Applied English Linguistics","https://www.hkmu.edu.hk/as/programmes-courses/tpg/maaelf/"],
+["HKMU","School of Arts and Social Sciences","MA","Master of Arts in Bilingual Professional Translation","https://www.hkmu.edu.hk/as/programmes-courses/tpg/mabptf/"],
+["HKMU","School of Arts and Social Sciences","MA","Master of Arts in Chinese Literature","https://www.hkmu.edu.hk/as/tc/programmes-courses/tpg/maclf/"],
+["HKMU","School of Arts and Social Sciences","MA","Master of Arts in Creative Industries and Cultural Assets","https://www.hkmu.edu.hk/as/programmes-courses/tpg/macicaf/"],
+["HKMU","School of Arts and Social Sciences","MA","Master of Arts in Creative Writing","https://www.hkmu.edu.hk/as/tc/programmes-courses/tpg/macwf/"],
+["HKMU","School of Arts and Social Sciences","MA","Master of Arts in Cultural and Heritage Tourism (Chinese version)","https://www.hkmu.edu.hk/as/tc/programmes-courses/tpg/macahtf/"],
+["HKMU","School of Arts and Social Sciences","MA","Master of Arts in Cultural and Heritage Tourism (English version)","https://www.hkmu.edu.hk/as/programmes-courses/tpg/macahtf/"],
+["HKMU","School of Arts and Social Sciences","MSocSc","Master of Social Sciences (with specialisations)","https://www.hkmu.edu.hk/as/programmes-courses/tpg/msscf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MPM","Master of Professional Management in Global Sports Business (in Chinese)","https://www.hkmu.edu.hk/ba/mpmgsbcf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MPM","Master of Professional Management in Global Sports Business (in Chinese) (through Pathway 1)","https://www.hkmu.edu.hk/ba/mpmgsbcf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MAcc","Master of Accountancy","https://www.hkmu.edu.hk/ba/macf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MBA","Master of Business Administration","https://www.hkmu.edu.hk/ba/mbaf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MBA","Master of Business Administration (Special Entry Route)","https://www.hkmu.edu.hk/ba/mbaf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MBA","Master of Business Administration (in Chinese)","https://www.hkmu.edu.hk/ba/tc/mbacf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MBA","Master of Business Administration (in Chinese)(through Pathway 1)","https://www.hkmu.edu.hk/ba/tc/mbacf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MBA","Master of Business Administration (through Pathway 1)","https://www.hkmu.edu.hk/ba/mbaf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MCGC","Master of Corporate Governance and Compliance","https://www.hkmu.edu.hk/ba/mcgcf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MCGC","Master of Corporate Governance and Compliance (Special Entry Route)","https://www.hkmu.edu.hk/ba/mcgcf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MPM","Master of Professional Management in Food and Beverage Business (in Chinese)","https://www.hkmu.edu.hk/ba/mpmfbbcf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MPM","Master of Professional Management in Food and Beverage Business (in Chinese)(through Pathway 1)","https://www.hkmu.edu.hk/ba/mpmfbbcf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MPM","Master of Professional Management in Global Business and Marketing","https://www.hkmu.edu.hk/ba/mpmgbmf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MPM","Master of Professional Management in Global Business and Marketing (through Pathway 1)","https://www.hkmu.edu.hk/ba/mpmgbmf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MPM","Master of Professional Management in Optical Engineering (in Chinese)","https://www.hkmu.edu.hk/ba/mpmoecf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MPM","Master of Professional Management in Wealth Management","https://www.hkmu.edu.hk/ba/mpmwmf/"],
+["HKMU","Lee Shau Kee School of Business and Administration","MPM","Master of Professional Management in Wealth Management (through Pathway 1)","https://www.hkmu.edu.hk/ba/mpmwmf/"],
+["HKMU","School of Education and Languages","MSc","Master of Science in Communication Sciences and Child Language Disorders","https://www.hkmu.edu.hk/el/programmes-courses/postgraduate/mscscldf/"],
+["HKMU","School of Education and Languages","MEd","Master of Education in Educational Technology and Innovation","https://www.hkmu.edu.hk/el/programmes-courses/postgraduate-2/medetif/"],
+["HKMU","School of Education and Languages","MEd","Master of Education in English Language Education","https://www.hkmu.edu.hk/el/programmes-courses/taught-postgraduate/medele/"],
+["HKMU","School of Education and Languages","MEd","Master of Education in Teaching Chinese as an International Language","https://www.hkmu.edu.hk/el/programmes-courses/taught-postgraduate/medtcil/"],
+["HKMU","School of Education and Languages","MLS","Master of Language Studies in Chinese","https://www.hkmu.edu.hk/el/programmes-courses/postgraduate-2/mlsc/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Advanced Renal Care)","https://www.hkmu.edu.hk/nhs/programmes-courses/nursing-and-health-studies/postgraduate-programmes/master-of-nursing-with-specialization/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Advanced Renal Care)(through Pathway 1)","https://www.hkmu.edu.hk/nhs/programmes-courses/nursing-and-health-studies/postgraduate-programmes/master-of-nursing-with-specialization/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Palliative Care)","https://www.hkmu.edu.hk/nhs/programmes-courses/nursing-and-health-studies/postgraduate-programmes/master-of-nursing-with-specialization-pc/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Palliative Care)(through Pathway 1)","https://www.hkmu.edu.hk/nhs/programmes-courses/nursing-and-health-studies/postgraduate-programmes/master-of-nursing-with-specialization-pc/"],
+["HKMU","School of Nursing and Health Sciences","MSc","Master of Science in Adaptive Sports","https://www.hkmu.edu.hk/physio/programmes/taught-postgraduate-programmes/"],
+["HKMU","School of Nursing and Health Sciences","MAppSc","Master of Applied Science in Medical Laboratory Science","https://www.hkmu.edu.hk/nhs/programmes-courses/master-of-applied-science-in-medical-laboratory-science/"],
+["HKMU","School of Nursing and Health Sciences","MCMP","Master of Chinese Medicinal Pharmacy","https://www.hkmu.edu.hk/nhs/tc/programmes-courses/nursing-and-health-studies/postgraduate-programmes/master-of-chinese-medicinal-pharmacy/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Advanced Respiratory Nursing)","https://www.hkmu.edu.hk/nhs/programmes-courses/nursing-and-health-studies/postgraduate-programmes/master-of-nursing-with-specialization/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Advanced Respiratory Nursing)(through Pathway 1)","https://www.hkmu.edu.hk/nhs/programmes-courses/nursing-and-health-studies/postgraduate-programmes/master-of-nursing-with-specialization/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Chinese Medicinal Nursing)","https://www.hkmu.edu.hk/nhs/tc/programmes-courses/nursing-and-health-studies/postgraduate-programmes/mnchmnf/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Chinese Medicinal Nursing)(through Pathway 1)","https://www.hkmu.edu.hk/nhs/tc/programmes-courses/nursing-and-health-studies/postgraduate-programmes/mnchmnf/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Executive Administration)","https://www.hkmu.edu.hk/nhs/tc/programmes-courses/nursing-and-health-studies/postgraduate-programmes/mneacf/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Executive Administration)(through Pathway 1)","https://www.hkmu.edu.hk/nhs/tc/programmes-courses/nursing-and-health-studies/postgraduate-programmes/mneacf/"],
+["HKMU","School of Nursing and Health Sciences","MNurs","Master of Nursing (with specialisation in Management and Leadership)","https://www.hkmu.edu.hk/nhs/programmes-courses/nursing-and-health-studies/postgraduate-programmes/master-of-nursing-with-specialization/"],
+["HKMU","School of Nursing and Health Sciences","MSc","Master of Science in Smart Ageing and Gerontology","https://www.hkmu.edu.hk/nhs/programmes-courses/nursing-and-health-studies/postgraduate-programmes/master-of-science-in-smart-ageing-and-gerontology/"],
+["HKMU","School of Science and Technology","MSc","Master of Science in Cosmetic Technology and Management","https://www.hkmu.edu.hk/st/programmes/department-of-construction-and-quality-management/msc-in-cosmetic-technology-and-management/"],
+["HKMU","School of Science and Technology","MAppSc","Master of Applied Science in Intelligent Construction and Building Information Modelling","https://www.hkmu.edu.hk/st/programmes/department-of-construction-and-quality-management/masc-msc-in-intelligent-construction-and-building-information-modelling-mascicbim-mscicbim/"],
+["HKMU","School of Science and Technology","MComp","Master of Computing","https://www.hkmu.edu.hk/st/computing/programmes/full-time/3-credit-unit/mcompf/"],
+["HKMU","School of Science and Technology","MSc","Master of Science in Chinese Environmental Studies","https://www.hkmu.edu.hk/st/tc/%e8%aa%b2%e7%a8%8b/%e6%87%89%e7%94%a8%e7%a7%91%e5%ad%b8%e7%b3%bb/%e4%b8%ad%e5%9c%8b%e7%92%b0%e4%bf%9d%e7%a0%94%e7%a9%b6%e7%90%86%e5%ad%b8%e7%a2%a9%e5%a3%ab/"],
+["HKMU","School of Science and Technology","MSc","Master of Science in Global Environmental Management for Sustainable Development","https://www.hkmu.edu.hk/st/programmes/department-of-applied-science/master-of-science-global-environmental-management-for-sustainable-development-mscgemsdf/"],
+["HKMU","School of Science and Technology","MSc","Master of Science in Intelligent Construction and Building Information Modelling","https://www.hkmu.edu.hk/st/programmes/department-of-construction-and-quality-management/masc-msc-in-intelligent-construction-and-building-information-modelling-mascicbim-mscicbim/"],
+["HKMU","School of Science and Technology","MSc","Master of Science in Scientific Research","https://www.hkmu.edu.hk/st/programmes/department-of-applied-science/master-of-science-in-scientific-research/"]
+];
+// --------------------------------------------------------------------
+//  SUBJECT CATEGORY MAPPING (one category per programme)
+// --------------------------------------------------------------------
+function getSubjectCategory(row) {
+const uni = row[0];
+const dept = row[1];
+const prog = row[3].toLowerCase();
+const key = uni + '|' + dept;
+// Direct department mapping for most common cases
+const map = {
+"HKU|Faculty of Architecture": "Architecture, Design & Planning",
+"HKU|Faculty of Arts": "Arts & Humanities",
+"HKU|Faculty of Dentistry": "Medicine & Health",
+"HKU|Faculty of Education": "Education",
+"HKU|Faculty of Engineering": "Engineering & Technology",
+"HKU|Faculty of Law": "Law",
+"HKU|Faculty of Science": "Natural & Applied Sciences",
+"HKU|Faculty of Social Sciences": "Social Sciences",
+"HKU|HKU Business School": "Business & Management",
+"HKU|LKS Faculty of Medicine": "Medicine & Health",
+"HKU|School of Computing and Data Science": "Computing & Mathematics",
+"HKU|School of Governance and Policy": "Social Sciences",
+"CUHK|Anthropology": "Arts & Humanities",
+"CUHK|China Studies": "Arts & Humanities",
+"CUHK|Chinese Language and Literature": "Arts & Humanities",
+"CUHK|Cultural Studies": "Arts & Humanities",
+"CUHK|English": "Arts & Humanities",
+"CUHK|Fine Arts": "Arts & Humanities",
+"CUHK|History": "Arts & Humanities",
+"CUHK|Japanese Studies": "Arts & Humanities",
+"CUHK|Linguistics": "Arts & Humanities",
+"CUHK|Music": "Arts & Humanities",
+"CUHK|Philosophy": "Arts & Humanities",
+"CUHK|Religious Studies": "Arts & Humanities",
+"CUHK|Theology": "Arts & Humanities",
+"CUHK|Translation": "Arts & Humanities",
+"CUHK|Business Administration": "Business & Management",
+"CUHK|Education": "Education",
+"CUHK|Biomedical Engineering": "Engineering & Technology",
+"CUHK|Computer Science and Engineering": "Engineering & Technology",
+"CUHK|Electronic Engineering": "Engineering & Technology",
+"CUHK|Engineering": "Engineering & Technology",
+"CUHK|Information Engineering": "Engineering & Technology",
+"CUHK|Mechanical and Automation Engineering": "Engineering & Technology",
+"CUHK|Systems Engineering and Engineering Management": "Engineering & Technology",
+"CUHK|Earth System and GeoInformation Science": "Natural & Applied Sciences",
+"CUHK|Gender Studies": "Social Sciences",
+"CUHK|Law": "Law",
+"CUHK|Anaesthesia and Intensive Care": "Medicine & Health",
+"CUHK|Anatomical and Cellular Pathology": "Medicine & Health",
+"CUHK|Biomedical Sciences": "Medicine & Health",
+"CUHK|Chemical Pathology": "Medicine & Health",
+"CUHK|Chinese Medicine": "Medicine & Health",
+"CUHK|Imaging and Interventional Radiology": "Medicine & Health",
+"CUHK|Medical Sciences": "Medicine & Health",
+"CUHK|Microbiology": "Medicine & Health",
+"CUHK|Nursing": "Medicine & Health",
+"CUHK|Obstetrics and Gynaecology": "Medicine & Health",
+"CUHK|Ophthalmology and Visual Sciences": "Medicine & Health",
+"CUHK|Orthopaedics and Traumatology": "Medicine & Health",
+"CUHK|Otorhinolaryngology and Communication Sciences": "Medicine & Health",
+"CUHK|Pharmacy": "Medicine & Health",
+"CUHK|Public Health": "Medicine & Health",
+"CUHK|Surgery": "Medicine & Health",
+"CUHK|Chemistry": "Natural & Applied Sciences",
+"CUHK|Earth and Environmental Sciences": "Natural & Applied Sciences",
+"CUHK|Life Sciences": "Natural & Applied Sciences",
+"CUHK|Materials Science and Engineering": "Natural & Applied Sciences",
+"CUHK|Mathematics": "Natural & Applied Sciences",
+"CUHK|Physics": "Natural & Applied Sciences",
+"CUHK|Risk Management Science": "Natural & Applied Sciences",
+"CUHK|Science": "Natural & Applied Sciences",
+"CUHK|Statistics": "Natural & Applied Sciences",
+"CUHK|Architecture": "Architecture, Design & Planning",
+"CUHK|Communication": "Social Sciences",
+"CUHK|Economics": "Social Sciences",
+"CUHK|Geography and Resource Management": "Social Sciences",
+"CUHK|Governance and Policy Science": "Social Sciences",
+"CUHK|Psychology": "Social Sciences",
+"CUHK|Social Science": "Social Sciences",
+"CUHK|Social Work": "Social Sciences",
+"CUHK|Sociology": "Social Sciences",
+"HKUST|Chemistry": "Natural & Applied Sciences",
+"HKUST|Life Science": "Natural & Applied Sciences",
+"HKUST|Mathematics": "Natural & Applied Sciences",
+"HKUST|Ocean Science": "Natural & Applied Sciences",
+"HKUST|Physics": "Natural & Applied Sciences",
+"HKUST|School of Engineering": "Engineering & Technology",
+"HKUST|Chemical and Biological Engineering": "Engineering & Technology",
+"HKUST|Civil and Environmental Engineering": "Engineering & Technology",
+"HKUST|Computer Science and Engineering": "Engineering & Technology",
+"HKUST|Electronic and Computer Engineering": "Engineering & Technology",
+"HKUST|Industrial Engineering and Decision Analytics": "Engineering & Technology",
+"HKUST|Mechanical and Aerospace Engineering": "Engineering & Technology",
+"HKUST|School of Business and Management": "Business & Management",
+"HKUST|Accounting": "Business & Management",
+"HKUST|Economics": "Business & Management",
+"HKUST|Finance": "Business & Management",
+"HKUST|Information Systems, Business Statistics and Operations Management": "Business & Management",
+"HKUST|Management": "Business & Management",
+"HKUST|Marketing": "Business & Management",
+"HKUST|School of Humanities and Social Science": "Arts, Humanities & Social Sciences",
+"HKUST|Humanities": "Arts & Humanities",
+"HKUST|Social Science": "Social Sciences",
+"HKUST|Arts and Machine Creativity": "Arts & Humanities",
+"HKUST|Emerging Interdisciplinary Areas": "Interdisciplinary Studies",
+"HKUST|Environment and Sustainability": "Natural & Applied Sciences",
+"HKUST|Integrative Systems and Design": "Interdisciplinary Studies",
+"HKUST|Public Policy": "Social Sciences",
+"PolyU|Faculty of Business": "Business & Management",
+"PolyU|Faculty of Computer and Mathematical Sciences": "Computing & Mathematics",
+"PolyU|Faculty of Construction and Environment": "Engineering & Technology",
+"PolyU|Faculty of Engineering": "Engineering & Technology",
+"PolyU|Faculty of Health and Social Sciences": "Medicine & Health",
+"PolyU|Faculty of Humanities": "Arts & Humanities",
+"PolyU|Faculty of Science": "Natural & Applied Sciences",
+"PolyU|Graduate School": "Interdisciplinary Studies",
+"PolyU|School of Design": "Architecture, Design & Planning",
+"PolyU|School of Fashion and Textiles": "Architecture, Design & Planning",
+"PolyU|School of Hotel and Tourism Management": "Business & Management",
+"CityUHK|CityUHK Academy of Innovation": "Interdisciplinary Studies",
+"CityUHK|Department of Biomedical Engineering": "Engineering & Technology",
+"CityUHK|Department of Biomedical Sciences": "Medicine & Health",
+"CityUHK|Department of Neuroscience": "Medicine & Health",
+"CityUHK|College of Business": "Business & Management",
+"CityUHK|Department of Accountancy": "Business & Management",
+"CityUHK|Department of Decision Analytics and Operations": "Business & Management",
+"CityUHK|Department of Economics and Finance": "Business & Management",
+"CityUHK|Department of Information Systems": "Business & Management",
+"CityUHK|Department of Management": "Business & Management",
+"CityUHK|Department of Marketing": "Business & Management",
+"CityUHK|Department of Biostatistics": "Natural & Applied Sciences",
+"CityUHK|Department of Computer Science": "Engineering & Technology",
+"CityUHK|Department of Data Science": "Natural & Applied Sciences",
+"CityUHK|Department of Architecture and Civil Engineering": "Engineering & Technology",
+"CityUHK|Department of Electrical Engineering": "Engineering & Technology",
+"CityUHK|Department of Materials Science and Engineering": "Engineering & Technology",
+"CityUHK|Department of Mechanical Engineering": "Engineering & Technology",
+"CityUHK|Department of Systems Engineering": "Engineering & Technology",
+"CityUHK|College of Liberal Arts and Social Sciences": "Arts, Humanities & Social Sciences",
+"CityUHK|Department of Chinese and History": "Arts & Humanities",
+"CityUHK|Department of English": "Arts & Humanities",
+"CityUHK|Department of Linguistics and Translation": "Arts & Humanities",
+"CityUHK|Department of Media and Communication": "Social Sciences",
+"CityUHK|Department of Public and International Affairs": "Social Sciences",
+"CityUHK|Department of Social and Behavioural Sciences": "Social Sciences",
+"CityUHK|Department of Chemistry": "Natural & Applied Sciences",
+"CityUHK|Department of Mathematics": "Natural & Applied Sciences",
+"CityUHK|Department of Physics": "Natural & Applied Sciences",
+"CityUHK|Department of Infectious Diseases and Public Health": "Medicine & Health",
+"CityUHK|Department of Veterinary Clinical Sciences": "Medicine & Health",
+"CityUHK|School of Creative Media": "Arts & Humanities",
+"CityUHK|School of Energy and Environment": "Natural & Applied Sciences",
+"CityUHK|School of Law": "Law",
+"HKBU|Faculty of Arts and Social Sciences": "Arts, Humanities & Social Sciences",
+"HKBU|School of Business": "Business & Management",
+"HKBU|School of Creative Arts": "Arts & Humanities",
+"HKBU|Faculty of Science": "Natural & Applied Sciences",
+"HKBU|School of Chinese Medicine": "Medicine & Health",
+"HKBU|School of Communication": "Social Sciences",
+"LingU|Faculty of Arts": "Arts & Humanities",
+"LingU|Faculty of Business": "Business & Management",
+"LingU|Faculty of Social Sciences": "Social Sciences",
+"LingU|School of Data Science": "Computing & Mathematics",
+"LingU|School of Graduate Studies": "Interdisciplinary Studies",
+"LingU|Wu Jieh Yee School of Interdisciplinary Studies": "Interdisciplinary Studies",
+"EdUHK|Graduate School": "Education",
+"EdUHK|Registry": "Education",
+"HKMU|School of Arts and Social Sciences": "Arts, Humanities & Social Sciences",
+"HKMU|Lee Shau Kee School of Business and Administration": "Business & Management",
+"HKMU|School of Education and Languages": "Education",
+"HKMU|School of Nursing and Health Sciences": "Medicine & Health",
+"HKMU|School of Science and Technology": "Natural & Applied Sciences",
+};
+// Programme‑specific overrides for departments that mix categories
+if (key === "PolyU|Faculty of Health and Social Sciences") {
+if (/\b(nursing|health|medical|physiotherapy|occupational therapy|optometry|vision|rehabilitation|mental health|speech therapy|imaging|laboratory)\b/.test(prog))
+return "Medicine & Health";
+return "Social Sciences"; // social work, psychology, counselling, policy etc.
+}
+if (key === "EdUHK|Graduate School") {
+if (prog.includes("public administration") || prog.includes("law") || prog.includes("global higher education"))
+return "Social Sciences";
+if (prog.includes("business communication") || prog.includes("digital marketing") || prog.includes("e-sports"))
+return "Business & Management";
+if (prog.includes("occupational therapy") || prog.includes("neuroscience"))
+return "Medicine & Health";
+return "Education";
+}
+if (key === "EdUHK|Registry") {
+if (prog.includes("psychology") && !prog.includes("education"))
+return "Social Sciences";
+return "Education";
+}
+if (key === "CityUHK|Department of Architecture and Civil Engineering") {
+if (prog.includes("architecture") || prog.includes("urban design"))
+return "Architecture, Design & Planning";
+return "Engineering & Technology";
+}
+if (key === "PolyU|Faculty of Construction and Environment") {
+if (prog.includes("real estate") || prog.includes("construction") || prog.includes("project management"))
+return "Business & Management";
+return "Engineering & Technology";
+}
+if (key === "HKBU|Faculty of Arts and Social Sciences") {
+if (prog.includes("social work") || prog.includes("counselling") || prog.includes("psychology") || prog.includes("sport") || prog.includes("public administration") || prog.includes("contemporary china") || prog.includes("smart resilient") || prog.includes("media"))
+return "Social Sciences";
+return "Arts & Humanities";
+}
+if (key === "HKUST|School of Humanities and Social Science") {
+if (prog.includes("china") || prog.includes("global"))
+return "Social Sciences";
+return "Arts & Humanities";
+}
+if (map[key]) return map[key];
+// Fallback using keywords
+if (/\b(law|llm|juris doctor|legal)\b/.test(prog)) return "Law";
+if (/\b(nursing|medicine|health|pharmacy|chinese medicine|optometry|rehabilitation|physiotherapy|occupational therapy|speech|medical|veterinary|public health|epidemiology|biomedical)\b/.test(prog)) return "Medicine & Health";
+if (/\b(education|teaching|pedagogy|curriculum|educational|school)\b/.test(prog)) return "Education";
+if (/\b(engineering|computer|electronic|mechanical|civil|chemical|aeronautical|robotics|manufacturing|semiconductor|information technology|cybersecurity|blockchain|data science|artificial intelligence|machine learning)\b/.test(prog)) return "Engineering & Technology";
+if (/\b(business|management|marketing|finance|accounting|economics|mba|emba|supply chain|logistics|human resource|corporate governance|wealth management|entrepreneurship|real estate|tourism|hospitality)\b/.test(prog)) return "Business & Management";
+if (/\b(architecture|design|fashion|textile|urban|landscape|creative media|visual arts|music|film|cinematic|fine arts|art history)\b/.test(prog)) return "Architecture, Design & Planning";
+if (/\b(psychology|sociology|social work|social policy|public policy|government|international affairs|counselling|communication|journalism|media|political|public administration)\b/.test(prog)) return "Social Sciences";
+if (/\b(chemistry|physics|mathematics|statistics|life sciences|biology|environmental|ocean|earth|materials|nutrition|food|data analytics|biostatistics)\b/.test(prog)) return "Natural & Applied Sciences";
+if (/\b(chinese|history|philosophy|literature|linguistics|translation|language|religious|theology|culture|humanities|english|japanese|anthropology)\b/.test(prog)) return "Arts & Humanities";
+return "Interdisciplinary Studies";
+}
+// --------------------------------------------------------------------
+//  REMAINING LOGIC (unchanged except for filter integration)
+// --------------------------------------------------------------------
+const PAGE_SIZE = 100;
+let currentRows = [...D];
+let sortCol = -1;
+let sortAsc = true;
+let currentPage = 1;
+function populateFilters() {
+const unis = [...new Set(D.map(r => r[0]))].sort();
+const awards = [...new Set(D.map(r => r[2]))].sort();
+const uniSelect = document.getElementById("uniFilter");
+const awardSelect = document.getElementById("awardFilter");
+unis.forEach(u => { const opt = document.createElement("option"); opt.value = u; opt.textContent = u; uniSelect.appendChild(opt); });
+awards.forEach(a => { const opt = document.createElement("option"); opt.value = a; opt.textContent = a; awardSelect.appendChild(opt); });
+// Subject category options
+const catSet = new Set(D.map(r => getSubjectCategory(r)));
+const cats = Array.from(catSet).sort();
+const subjSelect = document.getElementById("subjFilter");
+cats.forEach(c => { const opt = document.createElement("option"); opt.value = c; opt.textContent = c; subjSelect.appendChild(opt); });
+}
+function filterAndSort() {
+const q = (document.getElementById("q").value || "").toLowerCase();
+const uni = document.getElementById("uniFilter").value;
+const award = document.getElementById("awardFilter").value;
+const subj = document.getElementById("subjFilter").value;
+currentRows = D.filter(r => {
+const matchesQuery = !q ||
+r[0].toLowerCase().includes(q) ||
+r[1].toLowerCase().includes(q) ||
+r[2].toLowerCase().includes(q) ||
+r[3].toLowerCase().includes(q);
+const matchesUni = !uni || r[0] === uni;
+const matchesAward = !award || r[2] === award;
+const matchesSubj = !subj || getSubjectCategory(r) === subj;
+return matchesQuery && matchesUni && matchesAward && matchesSubj;
+});
+if (sortCol !== -1) {
+currentRows.sort((a, b) => {
+let valA = a[sortCol];
+let valB = b[sortCol];
+if (valA < valB) return sortAsc ? -1 : 1;
+if (valA > valB) return sortAsc ? 1 : -1;
+return 0;
+});
+}
+}
+function render() {
+filterAndSort();
+const totalPages = Math.max(1, Math.ceil(currentRows.length / PAGE_SIZE));
+if (currentPage > totalPages) currentPage = totalPages;
+if (currentPage < 1) currentPage = 1;
+const headers = document.querySelectorAll('th');
+headers.forEach(th => th.classList.remove('sort-asc', 'sort-desc'));
+const activeHeader = Array.from(headers).find(th => th.getAttribute('onclick')?.includes(`setSort(${sortCol})`));
+if(activeHeader) activeHeader.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+const startIdx = (currentPage - 1) * PAGE_SIZE;
+const endIdx = Math.min(startIdx + PAGE_SIZE, currentRows.length);
+const pageRows = currentRows.slice(startIdx, endIdx);
+document.getElementById("tbody").innerHTML = pageRows.map((r, idx) => {
+const globalIdx = startIdx + idx;
+const linkHtml = r[4] ? `<a href="${r[4]}" target="_blank" rel="noopener">${r[3]}</a>` : r[3];
+return `<tr>
+<td class="num">${globalIdx + 1}</td>
+<td><span class="uni-badge">${r[0]}</span></td>
+<td>${linkHtml}</td>
+<td>${r[2]}</td>
+<td class="muted">${r[1]}</td>
+</tr>`;
+}).join("");
+const uniqueUnis = new Set(currentRows.map(r => r[0]));
+const uniqueDepts = new Set(currentRows.map(r => r[0] + '|' + r[1]));
+document.getElementById("c-count").textContent = currentRows.length.toLocaleString();
+document.getElementById("c-uni").textContent = uniqueUnis.size;
+document.getElementById("c-dept").textContent = uniqueDepts.size;
+const infoEl = document.getElementById("pgInfo");
+if (currentRows.length === 0) {
+infoEl.textContent = "No results found";
+} else {
+infoEl.textContent = `Showing ${startIdx + 1}–${endIdx} of ${currentRows.length.toLocaleString()} programmes`;
+}
+renderPagination(totalPages);
+document.getElementById("pgJump").max = totalPages;
+document.getElementById("pgJump").value = "";
+document.getElementById("pgJump").placeholder = currentPage;
+}
+function renderPagination(totalPages) {
+const container = document.getElementById("pgControls");
+let html = '';
+html += `<button class="pg-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹ Prev</button>`;
+if (totalPages <= 10) {
+for (let i = 1; i <= totalPages; i++) {
+html += `<button class="pg-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+}
+} else {
+html += `<button class="pg-btn ${1 === currentPage ? 'active' : ''}" onclick="goToPage(1)">1</button>`;
+const startPage = Math.max(2, currentPage - 1);
+const endPage = Math.min(totalPages - 1, currentPage + 1);
+if (startPage > 2) html += `<span style="color:#aaa;padding:0 4px;">…</span>`;
+for (let i = startPage; i <= endPage; i++) {
+html += `<button class="pg-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+}
+if (endPage < totalPages - 1) html += `<span style="color:#aaa;padding:0 4px;">…</span>`;
+html += `<button class="pg-btn ${totalPages === currentPage ? 'active' : ''}" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+}
+html += `<button class="pg-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next ›</button>`;
+container.innerHTML = html;
+}
+function goToPage(page) {
+const totalPages = Math.max(1, Math.ceil(currentRows.length / PAGE_SIZE));
+if (page < 1 || page > totalPages) return;
+currentPage = page;
+render();
+document.querySelector('.wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function jumpToPage() {
+const input = document.getElementById("pgJump");
+const page = parseInt(input.value);
+const totalPages = Math.max(1, Math.ceil(currentRows.length / PAGE_SIZE));
+if (isNaN(page)) return;
+if (page < 1 || page > totalPages) {
+input.style.borderColor = '#c33';
+setTimeout(() => { input.style.borderColor = ''; }, 1200);
+return;
+}
+goToPage(page);
+}
+function resetAndRender() {
+currentPage = 1;
+render();
+}
+function setSort(col) {
+if (sortCol === col) { sortAsc = !sortAsc; }
+else { sortCol = col; sortAsc = true; }
+currentPage = 1;
+render();
+}
+function exportToExcel() {
+const headers = ["No.", "University", "Programme", "Award", "Department", "Subject Category", "Link"];
+const csvContent = [
+headers.join(","),
+...currentRows.map((r, idx) => {
+return [
+idx + 1,
+`"${r[0].replace(/"/g, '""')}"`,
+`"${r[3].replace(/"/g, '""')}"`,
+`"${r[2].replace(/"/g, '""')}"`,
+`"${r[1].replace(/"/g, '""')}"`,
+`"${getSubjectCategory(r).replace(/"/g, '""')}"`,
+`"${r[4]}"`
+].join(",");
+})
+].join("\n");
+const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+const url = URL.createObjectURL(blob);
+const link = document.createElement("a");
+link.setAttribute("href", url);
+link.setAttribute("download", `HK_TPG_Programmes_${new Date().toISOString().split('T')[0]}.csv`);
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+}
+populateFilters();
+render();
+</script>
+</body>
+</html>
